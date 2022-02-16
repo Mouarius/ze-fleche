@@ -1,0 +1,12 @@
+{
+    "name": "ze-fleche",
+    "version": "0.1.0",
+    "description": "Une application de comptage de points pour un jeu de fléchettes.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Marius Menault",
+    "license": "ISC"
+}
