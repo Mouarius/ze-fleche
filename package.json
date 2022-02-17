@@ -4,9 +4,16 @@
     "description": "Une application de comptage de points pour un jeu de fléchettes.",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "parcel src/index.html"
     },
     "keywords": [],
     "author": "Marius Menault",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "vue": "^3.2.31"
+    },
+    "devDependencies": {
+        "@parcel/transformer-sass": "^2.3.1",
+        "@parcel/transformer-vue": "^2.3.1"
+    }
 }
