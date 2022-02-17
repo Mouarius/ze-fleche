@@ -5,20 +5,24 @@
 </template>
 
 <script>
+import store from "../store";
 export default {
     name: "ButtonGameMode",
-    props: ["buttonGameMode", "globalGameMode", "changeGlobalGameMode"],
+    props: ["buttonGameMode"],
     data() {
-        return {};
+        return {
+            globalState: store.state,
+            localState: {},
+        };
     },
     computed: {
         isActive() {
-            return this.buttonGameMode === this.globalGameMode;
+            return this.buttonGameMode === this.globalState.gameMode;
         },
     },
     methods: {
         buttonClickHandler() {
-            this.changeGlobalGameMode(this.buttonGameMode);
+            store.changeGlobalGameModeAction(this.buttonGameMode);
         },
     },
 };
@@ -41,6 +45,8 @@ button {
     background: radial-gradient(199.12% 449.86% at -25.66% 15.85%, rgba(217, 217, 217, 0) 0%, rgba(255, 255, 255, 0.24) 50%, rgba(166, 166, 166, 0.24) 75.52%), #faf8e3;
     /* Simple Shadow */
     box-shadow: 0px 8px 11px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 8px 0px rgba(253, 238, 22, 0);
+
     border-radius: 31px;
 
     transition: all 200ms linear;
@@ -48,8 +54,8 @@ button {
     margin-right: 2rem;
 
     &:hover {
-        cursor: pointer;
         box-shadow: 0px 8px 11px 2px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 0px 8px 0px rgba(253, 238, 22, 0.6);
     }
     &.active {
         color: #998600;
