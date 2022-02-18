@@ -15,8 +15,8 @@
             ><button class="number">10</button><button class="number">11</button><button class="number">12</button><button class="number">13</button><button class="number">14</button
             ><button class="number">15</button><button class="number">16</button><button class="number">17</button><button class="number">18</button><button class="number">19</button
             ><button class="number">20</button><button class="number">25</button>
-            <button @click="functionButtonClickHandler" id="double" class="double function">DOUBLE</button>
-            <button @click="functionButtonClickHandler" id="triple" class="triple function">TRIPLE</button>
+            <button @click="functionButtonClickHandler" id="double" :class="{ active: isDoubleActive }" class="double function">DOUBLE</button>
+            <button @click="functionButtonClickHandler" id="triple" :class="{ active: isTripleActive }" class="triple function">TRIPLE</button>
             <button @click.stop="functionButtonClickHandler" id="undo" class="undo function"><span class="fa-solid fa-arrow-rotate-left" /></button>
         </div>
         <img class="game-pad-shape" src="../../assets/gamepad-shape.svg" alt="shape" />
@@ -40,9 +40,6 @@ export default {
                     //Separates the value and the modifier letter
                     const matchResult = strVal.match(/(\D)?(\d+)/);
                     const [, modifier, strValue] = matchResult;
-                    console.log("🚀 ~ file: GamePad.vue ~ line 43 ~ returnthis.localState.playerShots.reduce ~ matchResult", matchResult);
-                    console.log("modifier", modifier);
-                    console.log("value", strValue);
                     let numberValue = parseInt(strValue);
 
                     if (modifier === "T") {
@@ -50,7 +47,6 @@ export default {
                     } else if (modifier === "D") {
                         numberValue = numberValue * 2;
                     }
-
                     return acc + numberValue;
                 }, 0);
             }
@@ -61,6 +57,12 @@ export default {
                 return this.localState.scoreModifier[0].toUpperCase();
             }
             return "";
+        },
+        isDoubleActive() {
+            return this.localState.scoreModifier === "double";
+        },
+        isTripleActive() {
+            return this.localState.scoreModifier === "triple";
         },
     },
     methods: {
@@ -81,9 +83,7 @@ export default {
         numberButtonClickHandler(e) {
             const typedValue = e.target.textContent;
             console.log(typedValue);
-            if (typedValue === "DOUBLE") {
-            } else if (typedValue === "TRIPLE") {
-            } else if (typedValue) this.addShot(typedValue);
+            this.addShot(typedValue);
         },
         functionButtonClickHandler(e) {
             if (e.target.id === "undo") {
@@ -161,6 +161,7 @@ export default {
         bottom: 0;
         position: absolute;
         z-index: -1;
+
         svg {
             box-shadow: 0px -19px 25px rgba(0, 0, 0, 0.25);
         }
@@ -203,6 +204,9 @@ export default {
             grid-column-end: span 2;
             width: auto;
             font-size: 1.2rem;
+            &.active {
+                background: v.$color-success-dark;
+            }
         }
         .double {
             background: v.$color-success;
