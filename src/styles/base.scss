@@ -1,18 +1,13 @@
+@use "./variables" as v;
+
 :root {
     font-size: 16px;
     font-family: "Work Sans", sans-serif;
 }
 
-$yellow-50: #fff376;
-$bg-dark: #3b364f;
-$text-black: #3b364f;
-$text-white: #f7efff;
-
-$grey-800: #4d4863;
-$grey-500: #67607e;
-
 #app {
-    background-color: $bg-dark;
+    background-color: v.$color-bg-dark;
+    color: v.$color-text-black;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -20,12 +15,15 @@ $grey-500: #67607e;
     width: 100vw;
 
     .page-content {
+        & > div {
+            width: 100%;
+        }
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
 
-        position: relative;
-        margin-top: 24px;
+        padding-top: 24px;
         width: 90vw;
         max-width: 460px;
     }
@@ -42,7 +40,7 @@ h1 {
 
     letter-spacing: -0.02em;
 
-    color: $yellow-50;
+    color: v.$color-secondary;
     text-shadow: 1px 2px 8px rgba(247, 220, 96, 0.18);
 }
 
@@ -54,7 +52,7 @@ h2 {
     font-weight: 600;
     text-align: left;
 
-    color: $text-white;
+    color: v.$color-text-pale;
     margin-bottom: 1rem;
 }
 
