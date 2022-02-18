@@ -4,14 +4,20 @@ const initialPlayers = [
     {
         id: 0,
         name: "Emma",
+        score: 0,
+        isActive: false,
     },
     {
         id: 1,
         name: "Marius",
+        score: 0,
+        isActive: true,
     },
     {
         id: 2,
         name: "Lucas",
+        score: 0,
+        isActive: false,
     },
 ];
 

@@ -39,7 +39,7 @@
 
 <script>
 import ButtonGameMode from "./components/ButtonGameMode.vue";
-import Leaderboard from "./components/Leaderboard.vue";
+import Leaderboard from "./components/GamePage/Leaderboard.vue";
 import PlayersList from "./components/PlayersList.vue";
 import store from "./store";
 
