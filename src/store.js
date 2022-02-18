@@ -20,7 +20,11 @@ const store = {
     state: reactive({
         players: initialPlayers,
         gameMode: "301",
+        inGame: true,
     }),
+    toggleIngameAction() {
+        this.state.inGame = !this.state.inGame;
+    },
 
     addPlayerAction(playerName) {
         const idList = this.state.players.map((p) => p.id);
