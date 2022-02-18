@@ -18,33 +18,20 @@
         <div class="game-page" v-else>
             <header><h1>301</h1></header>
             <leaderboard />
-            <div class="game-pad">
-                <header><h2>Marius</h2></header>
-                <div class="inline-score"><span class="result">12</span> +<span class="result">12</span> + <span class="result">12</span> = <span class="result total">124</span></div>
-                <div class="numpad">
-                    <button class="number">0</button><button class="number">1</button><button class="number">2</button><button class="number">3</button><button class="number">4</button
-                    ><button class="number">5</button><button class="number">6</button><button class="number">7</button><button class="number">8</button><button class="number">9</button
-                    ><button class="number">10</button><button class="number">11</button><button class="number">12</button><button class="number">13</button><button class="number">14</button
-                    ><button class="number">15</button><button class="number">16</button><button class="number">17</button><button class="number">18</button><button class="number">19</button
-                    ><button class="number">20</button><button class="number">25</button>
-                    <button class="double function">DOUBLE</button>
-                    <button class="triple function">TRIPLE</button>
-                    <button class="undo function"><i class="fa-solid fa-arrow-rotate-left"></i></button>
-                </div>
-                <img class="game-pad-shape" src="./assets/gamepad-shape.svg" alt="shape" />
-            </div>
+            <game-pad />
         </div>
     </div>
 </template>
 
 <script>
 import ButtonGameMode from "./components/ButtonGameMode.vue";
+import GamePad from "./components/GamePage/GamePad.vue";
 import Leaderboard from "./components/GamePage/Leaderboard.vue";
 import PlayersList from "./components/PlayersList.vue";
 import store from "./store";
 
 export default {
-    components: { ButtonGameMode, PlayersList, Leaderboard },
+    components: { ButtonGameMode, PlayersList, Leaderboard, GamePad },
     name: "App",
     data() {
         return {
@@ -63,127 +50,8 @@ export default {
 <style lang="scss">
 @use "styles/variables" as v;
 
-.inline-score {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-
-    margin-bottom: 2rem;
-    font-family: "Public Sans", sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-
-    .result {
-        display: flex;
-        align-items: center;
-
-        background: v.$color-grey-50;
-        height: 2rem;
-        border-radius: 2rem;
-        text-align: center;
-
-        padding: 0 0.7rem;
-        margin: 0 0.5rem;
-    }
-    .total {
-        background-color: v.$color-primary;
-        color: white;
-    }
-}
-
 .game-page {
     position: relative;
-}
-.game-pad {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    padding: 1rem;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    h2 {
-        color: v.$color-text-black;
-    }
-    .game-pad-shape {
-        width: 100%;
-        height: 22rem;
-        bottom: 0;
-        position: absolute;
-        z-index: -1;
-        svg {
-            box-shadow: 0px -19px 25px rgba(0, 0, 0, 0.25);
-        }
-    }
-
-    .numpad {
-        display: grid;
-        justify-content: center;
-        grid-template-columns: repeat(7, 2.625rem);
-        grid-template-rows: repeat(4, 2.625rem);
-        column-gap: 7px;
-        row-gap: 7px;
-
-        button {
-            width: 42px;
-            height: 42px;
-            border: none;
-            background: v.$color-primary-light;
-            box-shadow: v.$box-shadow-S;
-            border-radius: 14px;
-
-            font-family: Work Sans;
-            font-style: normal;
-            font-weight: 600;
-            font-size: 1.5rem;
-            text-align: center;
-            color: #ffffff;
-            transition: all 0.2s ease;
-
-            &:hover {
-                box-shadow: 0px 2px 9px 2px rgba(0, 0, 0, 0.06);
-                box-shadow: 0px 0px 9px 2px rgba(139, 77, 255, 0.25);
-            }
-            &:active {
-                background-color: v.$color-primary;
-                transform: scale(0.93);
-            }
-        }
-        .function {
-            grid-column-end: span 2;
-            width: auto;
-            font-size: 1.2rem;
-        }
-        .double {
-            background: v.$color-success;
-            &:active {
-                background: v.$color-success-dark;
-            }
-        }
-        .triple {
-            background: v.$color-success;
-            &:active {
-                background: v.$color-success-dark;
-            }
-        }
-        .undo {
-            background: v.$color-alert;
-            i {
-                transition: all 0.1s linear;
-            }
-            &:active {
-                background: v.$color-alert-dark;
-                i {
-                    transform: rotate(-90deg);
-                }
-            }
-        }
-    }
 }
 
 footer {
