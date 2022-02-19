@@ -2,15 +2,9 @@
     "name": "ze-fleche",
     "version": "0.1.0",
     "description": "Une application de comptage de points pour un jeu de fléchettes.",
-<<<<<<< HEAD
-    "main": "src/index.js",
-    "scripts": {
-        "start": "parcel watch src/index.html",
-=======
-    "main": "index.html",
+    "source": "src/index.html",
     "scripts": {
         "start": "parcel src/index.html",
->>>>>>> 57dcbb7c4d8e05109502a041148c2ffec6602f29
         "build": "parcel build src/index.html"
     },
     "keywords": [],
@@ -20,7 +14,8 @@
         "vue": "^3.2.31"
     },
     "devDependencies": {
-        "@parcel/transformer-sass": "^2.3.1",
-        "@parcel/transformer-vue": "^2.3.1"
+        "@parcel/transformer-sass": "^2.3.2",
+        "@parcel/transformer-vue": "^2.3.1",
+        "parcel": "^2.3.2"
     }
 }
