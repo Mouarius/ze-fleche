@@ -1,9 +1,7 @@
 <template>
     <li>
         <button><img class="burger-icon" src="../assets/burger-icon.svg" /></button>
-        <input @change="onNameInputChangeHandler" class="player-name" v-model="playerName" placeholder="Joueur" />
-        <!--         <button><img class="pencil-icon" src="../assets/pencil-icon.svg" /></button>
- -->
+        <input @keyup.enter="unFocus" ref="playerNameInput" type="text" @change="onNameInputChangeHandler" class="player-name" v-model="playerName" placeholder="Joueur" />
         <button @click="removeButtonClickHandler"><img class="cross-icon" src="../assets/cross.svg" /></button>
     </li>
 </template>
@@ -27,9 +25,13 @@ export default {
         onNameInputChangeHandler() {
             store.actions.editPlayerName(this.player.id, this.playerName);
         },
+        unFocus(e) {
+            e.target.blur();
+        },
     },
     mounted() {
         this.playerName = this.player.name;
+        this.$refs.playerNameInput.focus();
     },
 };
 </script>
