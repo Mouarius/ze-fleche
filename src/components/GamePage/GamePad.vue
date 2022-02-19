@@ -99,7 +99,7 @@ export default {
         allShotsFired(newValue, oldValue) {
             if (newValue) {
                 logger.info(`All shots have been fired for ${this.player.name}`);
-                wait(2000).then(() => {
+                wait(1000).then(() => {
                     logger.info("We have waited for 2s, switching to another player");
                     const nextPlayer = this.globalState.players[getNextPlayerIndex(this.globalState.players)];
                     if (nextPlayer) {
@@ -111,6 +111,7 @@ export default {
         },
     },
     mounted() {
+        logger.info("Mounting GamePad");
         document.querySelectorAll("button.number").forEach((item) => {
             item.addEventListener("click", this.numberButtonClickHandler);
         });
