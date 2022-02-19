@@ -1,0 +1,309 @@
+button[data-v-c8d067] {
+  /* Button / Game Mode */
+  width: 114px;
+  height: 42px;
+  border: none;
+  font-family: "Work Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  color: #99870063;
+  background: radial-gradient(199.12% 449.86% at -25.66% 15.85%, rgba(217, 217, 217, 0) 0%, rgba(255, 255, 255, 0.24) 50%, rgba(166, 166, 166, 0.24) 75.52%), #faf8e3;
+  /* Simple Shadow */
+  box-shadow: 0px 8px 11px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 8px 0px rgba(253, 238, 22, 0);
+  border-radius: 31px;
+  transition: all 200ms linear;
+  margin-right: 2rem;
+}
+button[data-v-c8d067]:hover {
+  box-shadow: 0px 8px 11px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 8px 0px rgba(253, 238, 22, 0.6);
+}
+button.active[data-v-c8d067] {
+  color: #998600;
+  background: radial-gradient(199.12% 449.86% at -25.66% 15.85%, rgba(240, 226, 79, 0.2376) 0%, rgba(255, 255, 255, 0.24) 50%, rgba(223, 198, 75, 0.24) 75.52%), #fff376;
+}
+
+/*# sourceMappingURL=ButtonGameMode.vue.map */
+button[data-v-978b2b] {
+  background: none;
+  border: none;
+}
+li[data-v-978b2b] {
+  width: 100%;
+  height: 40px;
+  border-radius: 16px;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+}
+li[data-v-978b2b]:not(.add-player) {
+  margin-bottom: 9px;
+  background: radial-gradient(103.75% 4854.5% at 6.85% -10%, rgba(43, 12, 233, 0.2376) 0%, rgba(28, 0, 202, 0.066) 100%), rgba(179, 135, 233, 0.72);
+  backdrop-filter: blur(4px);
+}
+li .burger-icon[data-v-978b2b] {
+  margin-left: 8px;
+}
+li .player-name[data-v-978b2b] {
+  background: none;
+  border: none;
+  font-family: "Public Sans";
+  font-weight: 500;
+  font-size: 1rem;
+  color: white;
+  outline: none;
+  margin-left: 8px;
+}
+button[data-v-978b2b]:last-child {
+  margin-left: auto;
+  margin-right: 6px;
+}
+
+/*# sourceMappingURL=PlayerListItem.vue.map */
+.players-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 2rem;
+}
+.players-list ul {
+  display: flex;
+  flex-direction: column;
+  background: #4d4863;
+  box-shadow: 0px 8px 11px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 23px;
+  padding: 13px;
+}
+.players-list .add-player {
+  background: none;
+  height: 1.8rem;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.players-list .add-player button {
+  background: rgba(191, 179, 218, 0.22);
+  border: none;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  transition: all 120ms linear;
+}
+.players-list .add-player button:hover {
+  background: rgba(191, 179, 218, 0.4);
+}
+.players-list .add-player button:active {
+  background: rgba(191, 179, 218, 0.5);
+  transform: scale(0.98);
+}
+.players-list .add-player .add-icon {
+  height: 20px;
+  width: 20px;
+  transform: rotate(45deg);
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/*# sourceMappingURL=PlayersList.vue.map */
+.inline-score[data-v-a548a7] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 2rem;
+  font-family: "Public Sans", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.inline-score div[data-v-a548a7] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.inline-score div[data-v-a548a7]::after {
+  content: "+";
+}
+.inline-score div[data-v-a548a7]:last-of-type::after {
+  content: "=";
+}
+.inline-score .result[data-v-a548a7] {
+  display: flex;
+  align-items: center;
+  background: #f2efff;
+  height: 2rem;
+  border-radius: 2rem;
+  text-align: center;
+  padding: 0 0.7rem;
+  margin: 0 0.5rem;
+}
+.inline-score .total[data-v-a548a7] {
+  background-color: #b387e9;
+  color: white;
+}
+.game-pad[data-v-a548a7] {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.game-pad h2[data-v-a548a7] {
+  color: #3b364f;
+}
+.game-pad .game-pad-shape[data-v-a548a7] {
+  width: 100%;
+  height: 22rem;
+  bottom: 0;
+  position: absolute;
+  z-index: -1;
+}
+.game-pad .game-pad-shape svg[data-v-a548a7] {
+  box-shadow: 0px -19px 25px rgba(0, 0, 0, 0.25);
+}
+.game-pad .numpad[data-v-a548a7] {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(7, 2.625rem);
+  grid-template-rows: repeat(4, 2.625rem);
+  column-gap: 7px;
+  row-gap: 7px;
+}
+.game-pad .numpad button[data-v-a548a7] {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: #be98ec;
+  box-shadow: 0px 2px 9px 2px rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  font-family: Work Sans;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+.game-pad .numpad button[data-v-a548a7]:hover {
+  box-shadow: 0px 2px 9px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0px 0px 9px 2px rgba(139, 77, 255, 0.25);
+}
+.game-pad .numpad button[data-v-a548a7]:active {
+  background-color: #b387e9;
+  transform: scale(0.93);
+}
+.game-pad .numpad .function[data-v-a548a7] {
+  grid-column-end: span 2;
+  width: auto;
+  font-size: 1.2rem;
+}
+.game-pad .numpad .function.active[data-v-a548a7] {
+  background: #51db8d;
+}
+.game-pad .numpad .double[data-v-a548a7] {
+  background: #7efcb4;
+}
+.game-pad .numpad .double[data-v-a548a7]:active {
+  background: #51db8d;
+}
+.game-pad .numpad .triple[data-v-a548a7] {
+  background: #7efcb4;
+}
+.game-pad .numpad .triple[data-v-a548a7]:active {
+  background: #51db8d;
+}
+.game-pad .numpad .undo[data-v-a548a7] {
+  background: #eb5757;
+}
+.game-pad .numpad .undo span[data-v-a548a7] {
+  transition: all 0.1s linear;
+}
+.game-pad .numpad .undo[data-v-a548a7]:active {
+  background: #cf3e3e;
+}
+.game-pad .numpad .undo:active span[data-v-a548a7] {
+  transform: rotate(-90deg);
+}
+
+/*# sourceMappingURL=GamePad.vue.map */
+.leaderboard-item[data-v-a5490c] {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  border-radius: 0.7rem;
+  padding: 0.2rem 0.8rem;
+  margin: 0.2rem 0;
+  color: #ffffff;
+}
+.leaderboard-item.active[data-v-a5490c] {
+  background: rgba(255, 255, 255, 0.1);
+}
+.leaderboard-item .rank[data-v-a5490c] {
+  margin-left: 0.6rem;
+  font-size: 1rem;
+  align-self: flex-start;
+  color: #fff376;
+  flex: 1;
+}
+.leaderboard-item .score[data-v-a5490c] {
+  color: #be98ec;
+}
+.leaderboard-item .score .pts[data-v-a5490c] {
+  font-size: 1rem;
+  color: #865ebc;
+}
+
+/*# sourceMappingURL=LeaderboardItem.vue.map */
+.leaderboard[data-v-d65cef] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+/*# sourceMappingURL=Leaderboard.vue.map */
+.game-page {
+  position: relative;
+}
+footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+footer button {
+  border: none;
+  background: none;
+  display: block;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+}
+footer button h2 {
+  text-align: center;
+  color: #3b364f;
+}
+footer img {
+  width: 100%;
+  height: 88px;
+}
+
+/*# sourceMappingURL=App.vue.map */
+/*# sourceMappingURL=index.356d4792.css.map */
