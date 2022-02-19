@@ -11,7 +11,7 @@
             </section>
             <players-list />
             <footer>
-                <h2><button @click="startGameButtonHandler">C'est parti !</button></h2>
+                <button @click="startGameButtonHandler"><h2>C'est parti !</h2></button>
                 <img class="footer-shape" src="./assets/footer-shape.svg" />
             </footer>
         </div>
@@ -61,17 +61,21 @@ footer {
     left: 0;
     right: 0;
     text-align: center;
-    img {
-        width: 100%;
-        height: 88px;
-    }
-
-    h2 {
+    button {
+        border: none;
+        background: none;
         display: block;
-        text-align: center;
         position: absolute;
         bottom: 8px;
         width: 100%;
+        h2 {
+            text-align: center;
+            color: v.$color-text-black;
+        }
+    }
+    img {
+        width: 100%;
+        height: 88px;
     }
 }
 </style>
