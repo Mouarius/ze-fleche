@@ -25,7 +25,7 @@ export default {
             store.removePlayerAction(this.player.id);
         },
         onNameInputChangeHandler() {
-            store.editPlayerNameAction(this.player.id, this.playerName);
+            store.actions.editPlayerName(this.player.id, this.playerName);
         },
     },
     mounted() {

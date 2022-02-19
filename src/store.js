@@ -7,7 +7,7 @@ const store = {
     state: reactive({
         players: initialPlayers,
         gameMode: "301",
-        inGame: true,
+        inGame: false,
         shotsHistory: [],
     }),
     getters: {
@@ -44,10 +44,10 @@ const store = {
             player.listOfShots.pop();
             store.state.shotsHistory.pop();
         },
-    },
-
-    findPlayer(id) {
-        return this.state.players.find((p) => p.id === id);
+        editPlayerName: (playerId, newName) => {
+            const playerToEdit = store.getters.findPlayer(playerId);
+            playerToEdit.name = newName;
+        },
     },
 
     toggleIngameAction() {
@@ -66,10 +66,6 @@ const store = {
         };
         this.state.players.push(newPlayer);
     },
-    editPlayerNameAction(playerId, newName) {
-        const playerToEdit = this.getters.findPlayer(this.state, playerId);
-        playerToEdit.name = newName;
-    },
     removePlayerAction(playerId) {
         this.state.players = this.state.players.filter((p) => p.id !== playerId);
     },
@@ -80,7 +76,6 @@ const store = {
         const playerToUpdate = this.getters.findPlayer(this.state, playerId);
         playerToUpdate.score = updatedScore;
     },
-    updatePlayersAction() {},
     addShotToPlayerAction(playerId, shot) {
         const player = this.getters.findPlayer(this.state, playerId);
         if (player) {
