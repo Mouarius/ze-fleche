@@ -29,8 +29,11 @@ export default {
         addPlayerButttonHandler() {
             console.log("Add player triggered.");
 
-            store.addPlayerAction("");
+            store.addPlayerAction();
         },
+    },
+    mounted() {
+        store.addPlayerAction();
     },
 };
 </script>
