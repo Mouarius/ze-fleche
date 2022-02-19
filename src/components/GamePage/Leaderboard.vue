@@ -1,6 +1,6 @@
 <template>
     <ul class="leaderboard">
-        <leaderboard-item v-for="player in globalState.players" :key="player.id" :playerName="player.name" :score="player.score" :isActive="player.isActive" />
+        <leaderboard-item v-for="player in globalState.players" :key="player.id" :playerName="player.name" :score="player.score" :isActive="player.isActive" :rank="player.rank" />
     </ul>
 </template>
 

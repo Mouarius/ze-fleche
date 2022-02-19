@@ -1,6 +1,8 @@
 <template>
     <div class="game-pad">
-        <header><h2>Marius</h2></header>
+        <header>
+            <h2>{{ player.name }}</h2>
+        </header>
         <div class="inline-score">
             <template v-if="localState.playerShots.length > 0">
                 <div v-for="(score, index) in localState.playerShots" :key="index">
@@ -23,10 +25,15 @@
     </div>
 </template>
 <script>
+import { calculateScore, getActivePlayer, getNextPlayerIndex, wait } from "../../util/helper";
+import store from "../../store";
+import logger from "../../util/logger";
+
 export default {
     name: "GamePad",
     data() {
         return {
+            globalState: store.state,
             localState: {
                 playerShots: [],
                 scoreModifier: "",
@@ -34,23 +41,12 @@ export default {
         };
     },
     computed: {
-        playerShotsTotal() {
-            if (this.localState.playerShots.length > 0) {
-                return this.localState.playerShots.reduce((acc, strVal) => {
-                    //Separates the value and the modifier letter
-                    const matchResult = strVal.match(/(\D)?(\d+)/);
-                    const [, modifier, strValue] = matchResult;
-                    let numberValue = parseInt(strValue);
+        player() {
+            return getActivePlayer(this.globalState.players)[0];
+        },
 
-                    if (modifier === "T") {
-                        numberValue = numberValue * 3;
-                    } else if (modifier === "D") {
-                        numberValue = numberValue * 2;
-                    }
-                    return acc + numberValue;
-                }, 0);
-            }
-            return 0;
+        playerShotsTotal() {
+            return calculateScore(null, this.localState.playerShots);
         },
         scoreModifierSymbol() {
             if (this.localState.scoreModifier) {
@@ -64,25 +60,32 @@ export default {
         isTripleActive() {
             return this.localState.scoreModifier === "triple";
         },
+        allShotsFired() {
+            return this.localState.playerShots.length === 3;
+        },
     },
     methods: {
         say(message) {
             console.log(message);
         },
         addShot(shotValue) {
+            let calculatedShotValue = this.scoreModifierSymbol + shotValue;
+            this.localState.scoreModifier = "";
+
             if (this.localState.playerShots.length < 3) {
-                this.localState.playerShots.push(this.scoreModifierSymbol + shotValue);
-                this.localState.scoreModifier = "";
+                this.localState.playerShots.push(calculatedShotValue);
+                store.actions.addShotToPlayer(this.player.id, calculatedShotValue);
             }
         },
         removeLastShot() {
             if (this.localState.playerShots.length > 0) {
                 this.localState.playerShots.pop();
+                store.actions.removeShotToPlayer(this.player.id);
             }
         },
         numberButtonClickHandler(e) {
             const typedValue = e.target.textContent;
-            console.log(typedValue);
+            logger.info(`${this.player.name} did a ${typedValue}`);
             this.addShot(typedValue);
         },
         functionButtonClickHandler(e) {
@@ -90,6 +93,21 @@ export default {
                 return this.removeLastShot();
             }
             return (this.localState.scoreModifier = e.target.id);
+        },
+    },
+    watch: {
+        allShotsFired(newValue, oldValue) {
+            if (newValue) {
+                logger.info(`All shots have been fired for ${this.player.name}`);
+                wait(2000).then(() => {
+                    logger.info("We have waited for 2s, switching to another player");
+                    const nextPlayer = this.globalState.players[getNextPlayerIndex(this.globalState.players)];
+                    if (nextPlayer) {
+                        store.actions.setActivePlayer(nextPlayer.id);
+                        this.localState.playerShots = [];
+                    }
+                });
+            }
         },
     },
     mounted() {

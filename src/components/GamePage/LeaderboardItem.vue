@@ -1,7 +1,7 @@
 <template>
     <li class="leaderboard-item" :class="{ active: isActive }">
         <span class="player-name">{{ playerName }}</span
-        ><span class="rank">#1</span> <span class="score">{{ score }} <span class="pts">pts</span></span>
+        ><span class="rank">#{{ rank }}</span> <span class="score">{{ score }} <span class="pts">pts</span></span>
     </li>
 </template>
 <script>

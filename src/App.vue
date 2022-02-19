@@ -15,23 +15,18 @@
                 <img class="footer-shape" src="./assets/footer-shape.svg" />
             </footer>
         </div>
-        <div class="game-page" v-else>
-            <header><h1>301</h1></header>
-            <leaderboard />
-            <game-pad />
-        </div>
+        <game-page v-else />
     </div>
 </template>
 
 <script>
 import ButtonGameMode from "./components/ButtonGameMode.vue";
-import GamePad from "./components/GamePage/GamePad.vue";
-import Leaderboard from "./components/GamePage/Leaderboard.vue";
+import GamePage from "./components/GamePage/GamePage.vue";
 import PlayersList from "./components/PlayersList.vue";
 import store from "./store";
 
 export default {
-    components: { ButtonGameMode, PlayersList, Leaderboard, GamePad },
+    components: { ButtonGameMode, PlayersList, GamePage },
     name: "App",
     data() {
         return {
@@ -43,6 +38,11 @@ export default {
         startGameButtonHandler() {
             store.toggleIngameAction();
         },
+    },
+    mounted() {
+        if (this.globalState.players.length > 0) {
+            store.actions.setActivePlayer(this.globalState.players[0].id);
+        }
     },
 };
 </script>
