@@ -1,6 +1,7 @@
 import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
 import { calculatePlayersRanks, calculatePlayersScore, calculateScore } from "./util/helper";
+import { Player } from "./util/types";
 
 const store = {
     debug: true,
@@ -54,16 +55,15 @@ const store = {
         this.state.inGame = !this.state.inGame;
     },
 
-    addPlayerAction(playerName) {
-        const idList = this.state.players.map((p) => p.id);
-        const id = Math.max(...idList) + 1;
-        const newPlayer = {
-            id: id,
-            name: playerName,
-            score: 0,
-            isActive: false,
-            listOfShots: [],
-        };
+    addPlayerAction() {
+        const newPlayer = new Player();
+        if (this.state.players.length === 0) {
+            newPlayer.isActive = true;
+        } else {
+            const idList = this.state.players.map((p) => p.id);
+            const id = Math.max(...idList) + 1;
+            newPlayer.id = id;
+        }
         this.state.players.push(newPlayer);
     },
     removePlayerAction(playerId) {
