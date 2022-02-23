@@ -29,7 +29,7 @@ export default {
             if (rest === 0) {
                 lastShots = this.listOfShots.slice(-3);
             } else {
-                lastShots = this.listOfShots.slice(-rest);
+                lastShots = this.listOfShots.slice(0 - rest);
             }
             return lastShots;
         },
@@ -54,9 +54,10 @@ export default {
         height: 100%;
         width: 2rem;
         display: flex;
-        text-align: center;
+        align-items: center;
         justify-content: center;
-        font-size: 0.85em;
+        font-size: 0.6em;
+        font-weight: 600;
         margin-left: 0.5rem;
     }
 }
