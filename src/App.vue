@@ -36,7 +36,7 @@ export default {
     },
     methods: {
         startGameButtonHandler() {
-            store.toggleIngameAction();
+            return store.toggleIngameAction();
         },
     },
     mounted() {

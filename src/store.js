@@ -10,6 +10,7 @@ const store = {
         gameMode: "301",
         inGame: false,
         shotsHistory: [],
+        activeShotsCount: 0,
     }),
     getters: {
         players() {
