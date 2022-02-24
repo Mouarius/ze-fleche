@@ -3,7 +3,7 @@
         <h2>Joueurs</h2>
         <ul>
             <transition-group name="fade">
-                <player-list-item v-for="player in globalState.players" :key="player.id" :player="player" />
+                <player-list-item v-for="player in globalState.players" :key="player.id" :player="player" :addNewPlayer="addPlayerButttonHandler" />
             </transition-group>
 
             <li class="add-player">
