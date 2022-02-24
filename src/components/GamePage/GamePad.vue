@@ -19,7 +19,9 @@
             ><button class="number">20</button><button class="number">25</button>
             <button @click="functionButtonClickHandler" id="double" :class="{ active: isDoubleActive }" class="double function">DOUBLE</button>
             <button @click="functionButtonClickHandler" id="triple" :class="{ active: isTripleActive }" class="triple function">TRIPLE</button>
-            <button @click.stop="functionButtonClickHandler" id="undo" class="undo function"><span class="fa-solid fa-arrow-rotate-left" /></button>
+            <button @click.stop="functionButtonClickHandler" id="undo" class="undo function">
+                <i v-if="localState.typedShots.length === 0" class="fa-solid fa-arrow-left-long" /><i v-else class="fa-solid fa-arrow-rotate-left" />
+            </button>
         </div>
         <img class="game-pad-shape" src="../../assets/gamepad-shape.svg" alt="shape" />
     </div>
