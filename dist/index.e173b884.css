@@ -201,6 +201,27 @@ button.active[data-v-c8d067] {
 }
 
 /*# sourceMappingURL=GamePad.vue.map */
+.lastShots[data-v-a5490c] {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-right: 0.6rem;
+  flex: 1;
+}
+.lastShots .shot[data-v-a5490c] {
+  background: rgba(190, 152, 236, 0.2);
+  color: rgba(247, 239, 255, 0.6);
+  border-radius: 0.3rem;
+  box-sizing: border-box;
+  height: 100%;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6em;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
 .leaderboard-item[data-v-a5490c] {
   box-sizing: border-box;
   display: flex;
@@ -219,10 +240,12 @@ button.active[data-v-c8d067] {
   font-size: 1rem;
   align-self: flex-start;
   color: #fff376;
-  flex: 1;
+  flex: 0;
 }
 .leaderboard-item .score[data-v-a5490c] {
   color: #be98ec;
+  width: 5rem;
+  text-align: right;
 }
 .leaderboard-item .score .pts[data-v-a5490c] {
   font-size: 1rem;

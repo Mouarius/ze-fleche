@@ -1,3 +1,6 @@
+import store from "../store";
+import logger from "./logger";
+
 export const wait = (duration) =>
     new Promise((resolve) => {
         return setTimeout(() => resolve(), duration);
@@ -64,10 +67,45 @@ export const getActivePlayer = (players) => {
 
 export const getNextPlayerIndex = (players) => {
     const [activePlayer, activePlayerIndex] = getActivePlayer(players);
-    console.log("🚀 ~ file: helper.js ~ line 67 ~ getNextPlayerId ~ activePlayerIndex", activePlayerIndex);
-    console.log("🚀 ~ file: helper.js ~ line 67 ~ getNextPlayerId ~ activePlayer", activePlayer);
+
     if (activePlayerIndex < players.length - 1) {
         return activePlayerIndex + 1;
     }
     return 0;
+};
+export const getPreviousPlayerIndex = (players) => {
+    const [activePlayer, activePlayerIndex] = getActivePlayer(players);
+    if (activePlayerIndex > 0) {
+        return activePlayerIndex - 1;
+    }
+    return players.length - 1;
+};
+
+export const getNextPlayer = (players) => {
+    return players[getNextPlayerIndex(players)];
+};
+export const getPreviousPlayer = (players) => {
+    return players[getPreviousPlayerIndex(players)];
+};
+
+export const getPreviousPlayerInHistory = (players, shotsHistory) => {
+    if (shotsHistory.length >= 1) {
+        let previousPlayerInHistory = players.find((p) => p.id === shotsHistory[shotsHistory.length - 1].playerId);
+        return previousPlayerInHistory;
+    }
+    return null;
+};
+
+export const getPlayerLastShots = (player) => {
+    let lastShots;
+    let rest = player.listOfShots.length % 3;
+    if (player.listOfShots.length <= 3) {
+        return player.listOfShots;
+    }
+    if (rest === 0) {
+        lastShots = player.listOfShots.slice(-3);
+    } else {
+        lastShots = player.listOfShots.slice(-rest);
+    }
+    return lastShots;
 };

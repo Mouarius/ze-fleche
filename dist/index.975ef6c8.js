@@ -9737,7 +9737,7 @@ exports.default = {
     },
     methods: {
         startGameButtonHandler () {
-            _storeDefault.default.toggleIngameAction();
+            return _storeDefault.default.toggleIngameAction();
         }
     },
     mounted () {
@@ -9816,21 +9816,21 @@ const store = {
         shotsHistory: []
     }),
     getters: {
-        players () {
-            return store.state.players;
-        },
         findPlayer (id) {
             return store.state.players.find((p)=>p.id === id
             );
+        },
+        lastPlayer () {
+            if (store.state.shotsHistory.length > 0) {
+                let lastPlayerId = store.state.shotsHistory[store.state.shotsHistory.length - 1].playerId;
+                return this.findPlayer(lastPlayerId);
+            }
+        },
+        activePlayer () {
+            return _helper.getActivePlayer(store.state.players);
         }
     },
     actions: {
-        initShotsHistory: ()=>{
-            store.state.shotsHistory = [];
-        },
-        initPlayers: ()=>{
-            store.state.players = [];
-        },
         setActivePlayer: (id)=>{
             //Deactivate all the players
             store.state.players.forEach((p)=>{
@@ -9842,10 +9842,11 @@ const store = {
         addShotToPlayer: (playerId, shotValue)=>{
             const player = store.getters.findPlayer(playerId);
             player.listOfShots.push(shotValue);
-            store.state.shotsHistory.push([
-                playerId,
-                shotValue
-            ]);
+            let shotRecord = {
+                playerId: playerId,
+                value: shotValue
+            };
+            store.state.shotsHistory.push(shotRecord);
         },
         removeShotToPlayer: (playerId)=>{
             const player = store.getters.findPlayer(playerId);
@@ -9893,7 +9894,7 @@ const store = {
 };
 _vue.watchEffect(()=>{
     if (store.state.gameMode === "301") {
-        //Updates the players scores whenever the list of shots changes
+        //Updates the players scores and ranks whenever the list of shots changes
         store.state.players = _helper.calculatePlayersScore(store.state.gameMode, store.state.players);
         store.state.players = _helper.calculatePlayersRanks(store.state.gameMode, store.state.players);
     }
@@ -9923,6 +9924,20 @@ parcelHelpers.export(exports, "getActivePlayer", ()=>getActivePlayer
 );
 parcelHelpers.export(exports, "getNextPlayerIndex", ()=>getNextPlayerIndex
 );
+parcelHelpers.export(exports, "getPreviousPlayerIndex", ()=>getPreviousPlayerIndex
+);
+parcelHelpers.export(exports, "getNextPlayer", ()=>getNextPlayer
+);
+parcelHelpers.export(exports, "getPreviousPlayer", ()=>getPreviousPlayer
+);
+parcelHelpers.export(exports, "getPreviousPlayerInHistory", ()=>getPreviousPlayerInHistory
+);
+parcelHelpers.export(exports, "getPlayerLastShots", ()=>getPlayerLastShots
+);
+var _store = require("../store");
+var _storeDefault = parcelHelpers.interopDefault(_store);
+var _logger = require("./logger");
+var _loggerDefault = parcelHelpers.interopDefault(_logger);
 const wait = (duration)=>new Promise((resolve)=>{
         return setTimeout(()=>resolve()
         , duration);
@@ -9981,13 +9996,49 @@ const getActivePlayer = (players)=>{
 };
 const getNextPlayerIndex = (players)=>{
     const [activePlayer, activePlayerIndex] = getActivePlayer(players);
-    console.log("🚀 ~ file: helper.js ~ line 67 ~ getNextPlayerId ~ activePlayerIndex", activePlayerIndex);
-    console.log("🚀 ~ file: helper.js ~ line 67 ~ getNextPlayerId ~ activePlayer", activePlayer);
     if (activePlayerIndex < players.length - 1) return activePlayerIndex + 1;
     return 0;
 };
+const getPreviousPlayerIndex = (players)=>{
+    const [activePlayer, activePlayerIndex] = getActivePlayer(players);
+    if (activePlayerIndex > 0) return activePlayerIndex - 1;
+    return players.length - 1;
+};
+const getNextPlayer = (players)=>{
+    return players[getNextPlayerIndex(players)];
+};
+const getPreviousPlayer = (players)=>{
+    return players[getPreviousPlayerIndex(players)];
+};
+const getPreviousPlayerInHistory = (players, shotsHistory)=>{
+    if (shotsHistory.length >= 1) {
+        let previousPlayerInHistory = players.find((p)=>p.id === shotsHistory[shotsHistory.length - 1].playerId
+        );
+        return previousPlayerInHistory;
+    }
+    return null;
+};
+const getPlayerLastShots = (player)=>{
+    let lastShots;
+    let rest = player.listOfShots.length % 3;
+    if (player.listOfShots.length <= 3) return player.listOfShots;
+    if (rest === 0) lastShots = player.listOfShots.slice(-3);
+    else lastShots = player.listOfShots.slice(-rest);
+    return lastShots;
+};
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"htKrx":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./logger":"iiWRH","../store":"d8qyu"}],"iiWRH":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _store = require("../store");
+var _storeDefault = parcelHelpers.interopDefault(_store);
+exports.default = {
+    info (message) {
+        if (_storeDefault.default.debug) console.log(`INFO - `, message);
+    }
+};
+
+},{"../store":"d8qyu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"htKrx":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Player", ()=>Player
@@ -10108,17 +10159,18 @@ exports.default = {
         return {
             globalState: _storeDefault.default.state,
             localState: {
-                playerShots: [],
-                scoreModifier: ""
+                scoreModifier: "",
+                typedShots: [],
+                lastShotFired: false
             }
         };
     },
     computed: {
-        player () {
+        activePlayer () {
             return _helper.getActivePlayer(this.globalState.players)[0];
         },
         playerShotsTotal () {
-            return _helper.calculateScore(null, this.localState.playerShots);
+            return _helper.calculateScore(null, this.localState.typedShots);
         },
         scoreModifierSymbol () {
             if (this.localState.scoreModifier) return this.localState.scoreModifier[0].toUpperCase();
@@ -10129,54 +10181,84 @@ exports.default = {
         },
         isTripleActive () {
             return this.localState.scoreModifier === "triple";
-        },
-        allShotsFired () {
-            return this.localState.playerShots.length === 3;
         }
     },
     methods: {
-        say (message) {
-            console.log(message);
-        },
         addShot (shotValue) {
             let calculatedShotValue = this.scoreModifierSymbol + shotValue;
             this.localState.scoreModifier = "";
-            if (this.localState.playerShots.length < 3) {
-                this.localState.playerShots.push(calculatedShotValue);
-                _storeDefault.default.actions.addShotToPlayer(this.player.id, calculatedShotValue);
-            }
+            this.localState.typedShots.push(calculatedShotValue);
+            _storeDefault.default.actions.addShotToPlayer(this.activePlayer.id, calculatedShotValue);
         },
         removeLastShot () {
-            if (this.localState.playerShots.length > 0) {
-                this.localState.playerShots.pop();
-                _storeDefault.default.actions.removeShotToPlayer(this.player.id);
+            if (this.localState.typedShots.length > 0) {
+                _loggerDefault.default.info(`Removing last shot from ${this.activePlayer.name}`);
+                this.localState.typedShots.pop();
+                _storeDefault.default.actions.removeShotToPlayer(this.activePlayer.id);
             }
         },
         numberButtonClickHandler (e) {
             const typedValue = e.target.textContent;
-            _loggerDefault.default.info(`${this.player.name} did a ${typedValue}`);
-            this.addShot(typedValue);
+            _loggerDefault.default.info(`${this.activePlayer.name} did a ${typedValue}`);
+            if (this.localState.typedShots.length < 3) {
+                this.addShot(typedValue);
+                if (this.localState.typedShots.length === 3) this.moveToNextPlayer();
+            }
         },
         functionButtonClickHandler (e) {
-            if (e.target.id === "undo") return this.removeLastShot();
+            console.log("func");
+            if (e.target.id === "undo") {
+                if (this.localState.typedShots.length === 0) return this.moveToPreviousPlayer();
+                else return this.removeLastShot();
+            }
             return this.localState.scoreModifier = e.target.id;
-        }
-    },
-    watch: {
-        allShotsFired (newValue, oldValue) {
-            if (newValue) {
-                _loggerDefault.default.info(`All shots have been fired for ${this.player.name}`);
-                _helper.wait(1000).then(()=>{
-                    _loggerDefault.default.info("We have waited for 2s, switching to another player");
-                    const nextPlayer = this.globalState.players[_helper.getNextPlayerIndex(this.globalState.players)];
-                    if (nextPlayer) {
-                        _storeDefault.default.actions.setActivePlayer(nextPlayer.id);
-                        this.localState.playerShots = [];
-                    }
-                });
+        },
+        moveToNextPlayer () {
+            _loggerDefault.default.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
+            _helper.wait(100).then(()=>{
+                _loggerDefault.default.info("We have waited for 1s, switching to next player");
+                const nextPlayer = _helper.getNextPlayer(this.globalState.players);
+                if (nextPlayer) {
+                    _storeDefault.default.actions.setActivePlayer(nextPlayer.id);
+                    this.localState.typedShots = [];
+                }
+            });
+        },
+        moveToPreviousPlayer () {
+            _loggerDefault.default.info(`Mistakes have been made, moving to previous player...`);
+            let previousPlayer = _helper.getPreviousPlayerInHistory(this.globalState.players, this.globalState.shotsHistory);
+            console.log("🚀 ~ file: GamePad.vue ~ line 113 ~ moveToPreviousPlayer ~ previousPlayer", previousPlayer);
+            if (previousPlayer) {
+                _loggerDefault.default.info("Previous player is ", previousPlayer.name);
+                _storeDefault.default.actions.setActivePlayer(previousPlayer.id);
+                console.log(this.activePlayer);
+                this.localState.typedShots = [
+                    ..._helper.getPlayerLastShots(this.activePlayer)
+                ];
             }
         }
     },
+    // watch: {
+    //     allShotsFired(newValue, oldValue) {
+    //         if (newValue) {
+    //             logger.info(`All shots have been fired for ${this.activePlayer.name}`);
+    //             wait(1000).then(() => {
+    //                 logger.info("We have waited for 1s, switching to another player");
+    //                 const nextPlayer = this.globalState.players[getNextPlayerIndex(this.globalState.players)];
+    //                 if (nextPlayer) {
+    //                     store.actions.setActivePlayer(nextPlayer.id);
+    //                     this.localState.typedShots = [];
+    //                 }
+    //             });
+    //         }
+    //     },
+    //     activePlayer(newVal, oldVal) {
+    //         console.log("Active player changed");
+    //         let lastShots = getPlayerLastShots(this.activePlayer);
+    //         console.log("🚀 ~ file: GamePad.vue ~ line 123 ~ activePlayer ~ lastShots", lastShots);
+    //         this.localState.playerShots = lastShots;
+    //     },
+    // },
     mounted () {
         _loggerDefault.default.info("Mounting GamePad");
         document.querySelectorAll("button.number").forEach((item)=>{
@@ -10185,18 +10267,7 @@ exports.default = {
     }
 };
 
-},{"../../util/helper":"aPqmj","../../store":"d8qyu","../../util/logger":"iiWRH","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iiWRH":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _store = require("../store");
-var _storeDefault = parcelHelpers.interopDefault(_store);
-exports.default = {
-    info (message) {
-        if (_storeDefault.default.debug) console.log(`INFO - `, message);
-    }
-};
-
-},{"../store":"d8qyu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fZUoa":[function(require,module,exports) {
+},{"../../util/helper":"aPqmj","../../store":"d8qyu","../../util/logger":"iiWRH","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fZUoa":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "render", ()=>render
@@ -10222,13 +10293,14 @@ const _hoisted_5 = {
     class: "numpad"
 };
 const _hoisted_6 = /*#__PURE__*/ _vue.createStaticVNode("<button class=\"number\" data-v-a548a7>0</button><button class=\"number\" data-v-a548a7>1</button><button class=\"number\" data-v-a548a7>2</button><button class=\"number\" data-v-a548a7>3</button><button class=\"number\" data-v-a548a7>4</button><button class=\"number\" data-v-a548a7>5</button><button class=\"number\" data-v-a548a7>6</button><button class=\"number\" data-v-a548a7>7</button><button class=\"number\" data-v-a548a7>8</button><button class=\"number\" data-v-a548a7>9</button><button class=\"number\" data-v-a548a7>10</button><button class=\"number\" data-v-a548a7>11</button><button class=\"number\" data-v-a548a7>12</button><button class=\"number\" data-v-a548a7>13</button><button class=\"number\" data-v-a548a7>14</button><button class=\"number\" data-v-a548a7>15</button><button class=\"number\" data-v-a548a7>16</button><button class=\"number\" data-v-a548a7>17</button><button class=\"number\" data-v-a548a7>18</button><button class=\"number\" data-v-a548a7>19</button><button class=\"number\" data-v-a548a7>20</button><button class=\"number\" data-v-a548a7>25</button>", 22);
-const _hoisted_28 = /*#__PURE__*/ _withScopeId(()=>/*#__PURE__*/ _vue.createElementVNode("span", {
-        class: "fa-solid fa-arrow-rotate-left"
-    }, null, -1 /* HOISTED */ )
-);
-const _hoisted_29 = [
-    _hoisted_28
-];
+const _hoisted_28 = {
+    key: 0,
+    class: "fa-solid fa-arrow-left-long"
+};
+const _hoisted_29 = {
+    key: 1,
+    class: "fa-solid fa-arrow-rotate-left"
+};
 const _hoisted_30 = /*#__PURE__*/ _withScopeId(()=>/*#__PURE__*/ _vue.createElementVNode("img", {
         class: "game-pad-shape",
         src: _gamepadShapeSvgDefault.default,
@@ -10238,12 +10310,12 @@ const _hoisted_30 = /*#__PURE__*/ _withScopeId(()=>/*#__PURE__*/ _vue.createElem
 function render(_ctx, _cache) {
     return _vue.openBlock(), _vue.createElementBlock("div", _hoisted_1, [
         _vue.createElementVNode("header", null, [
-            _vue.createElementVNode("h2", null, _vue.toDisplayString(_ctx.player.name), 1 /* TEXT */ )
+            _vue.createElementVNode("h2", null, _vue.toDisplayString(_ctx.activePlayer.name), 1 /* TEXT */ )
         ]),
         _vue.createElementVNode("div", _hoisted_2, [
-            _ctx.localState.playerShots.length > 0 ? (_vue.openBlock(true), _vue.createElementBlock(_vue.Fragment, {
+            _ctx.localState.typedShots.length > 0 ? (_vue.openBlock(true), _vue.createElementBlock(_vue.Fragment, {
                 key: 0
-            }, _vue.renderList(_ctx.localState.playerShots, (score, index)=>{
+            }, _vue.renderList(_ctx.localState.typedShots, (score, index)=>{
                 return _vue.openBlock(), _vue.createElementBlock("div", {
                     key: index
                 }, [
@@ -10283,7 +10355,9 @@ function render(_ctx, _cache) {
                 ])),
                 id: "undo",
                 class: "undo function"
-            }, _hoisted_29)
+            }, [
+                _ctx.localState.typedShots.length === 0 ? (_vue.openBlock(), _vue.createElementBlock("i", _hoisted_28)) : (_vue.openBlock(), _vue.createElementBlock("i", _hoisted_29))
+            ])
         ]),
         _hoisted_30
     ]);
@@ -10420,11 +10494,29 @@ exports.default = {
         "playerName",
         "rank",
         "score",
-        "isActive"
+        "isActive",
+        "listOfShots"
     ],
     data () {
         return {
+            lastShots: [
+                "",
+                "",
+                ""
+            ]
         };
+    },
+    computed: {
+        lastThreeShots () {
+            let lastShots;
+            let rest = this.listOfShots.length % 3;
+            if (this.listOfShots.length <= 3) return this.listOfShots;
+            if (rest === 0) lastShots = this.listOfShots.slice(-3);
+            else lastShots = this.listOfShots.slice(0 - rest);
+            return lastShots;
+        }
+    },
+    watch: {
     }
 };
 
@@ -10442,11 +10534,22 @@ const _hoisted_1 = {
 const _hoisted_2 = {
     class: "rank"
 };
-const _hoisted_3 = /*#__PURE__*/ _vue.createTextVNode();
+const _hoisted_3 = {
+    class: "lastShots"
+};
 const _hoisted_4 = {
+    class: "shot"
+};
+const _hoisted_5 = {
+    class: "shot"
+};
+const _hoisted_6 = {
+    class: "shot"
+};
+const _hoisted_7 = {
     class: "score"
 };
-const _hoisted_5 = /*#__PURE__*/ _withScopeId(()=>/*#__PURE__*/ _vue.createElementVNode("span", {
+const _hoisted_8 = /*#__PURE__*/ _withScopeId(()=>/*#__PURE__*/ _vue.createElementVNode("span", {
         class: "pts"
     }, "pts", -1 /* HOISTED */ )
 );
@@ -10461,10 +10564,14 @@ function render(_ctx, _cache) {
     }, [
         _vue.createElementVNode("span", _hoisted_1, _vue.toDisplayString(_ctx.playerName), 1 /* TEXT */ ),
         _vue.createElementVNode("span", _hoisted_2, "#" + _vue.toDisplayString(_ctx.rank), 1 /* TEXT */ ),
-        _hoisted_3,
-        _vue.createElementVNode("span", _hoisted_4, [
+        _vue.createElementVNode("ul", _hoisted_3, [
+            _vue.createElementVNode("li", _hoisted_4, _vue.toDisplayString(_ctx.lastThreeShots[0]), 1 /* TEXT */ ),
+            _vue.createElementVNode("li", _hoisted_5, _vue.toDisplayString(_ctx.lastThreeShots[1]), 1 /* TEXT */ ),
+            _vue.createElementVNode("li", _hoisted_6, _vue.toDisplayString(_ctx.lastThreeShots[2]), 1 /* TEXT */ )
+        ]),
+        _vue.createElementVNode("span", _hoisted_7, [
             _vue.createTextVNode(_vue.toDisplayString(_ctx.score) + " ", 1 /* TEXT */ ),
-            _hoisted_5
+            _hoisted_8
         ])
     ], 2 /* CLASS */ );
 }
@@ -10500,12 +10607,14 @@ function render(_ctx, _cache) {
                 playerName: player.name,
                 score: player.score,
                 isActive: player.isActive,
-                rank: player.rank
+                rank: player.rank,
+                listOfShots: player.listOfShots
             }, null, 8 /* PROPS */ , [
                 "playerName",
                 "score",
                 "isActive",
-                "rank"
+                "rank",
+                "listOfShots"
             ]);
         }), 128 /* KEYED_FRAGMENT */ ))
     ]);
@@ -10641,7 +10750,8 @@ var _storeDefault = parcelHelpers.interopDefault(_store);
 exports.default = {
     name: "PlayerListItem",
     props: [
-        "player"
+        "player",
+        "addNewPlayer"
     ],
     data () {
         return {
@@ -10697,16 +10807,24 @@ function render(_ctx, _cache) {
     return _vue.openBlock(), _vue.createElementBlock("li", null, [
         _hoisted_1,
         _vue.withDirectives(_vue.createElementVNode("input", {
-            onKeyup: _cache[0] || (_cache[0] = _vue.withKeys((...args)=>_ctx.unFocus && _ctx.unFocus(...args)
-            , [
-                "enter"
-            ])),
+            onKeyup: [
+                _cache[0] || (_cache[0] = _vue.withKeys((...args)=>_ctx.unFocus && _ctx.unFocus(...args)
+                , [
+                    "enter"
+                ])),
+                _cache[1] || (_cache[1] = _vue.withKeys(_vue.withModifiers((...args)=>_ctx.addNewPlayer && _ctx.addNewPlayer(...args)
+                , [
+                    "prevent"
+                ]), [
+                    "tab"
+                ]))
+            ],
             ref: "playerNameInput",
             type: "text",
-            onChange: _cache[1] || (_cache[1] = (...args)=>_ctx.onNameInputChangeHandler && _ctx.onNameInputChangeHandler(...args)
+            onChange: _cache[2] || (_cache[2] = (...args)=>_ctx.onNameInputChangeHandler && _ctx.onNameInputChangeHandler(...args)
             ),
             class: "player-name",
-            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event)=>_ctx.playerName = $event
+            "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event)=>_ctx.playerName = $event
             ),
             placeholder: "Joueur"
         }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */ ), [
@@ -10716,7 +10834,7 @@ function render(_ctx, _cache) {
             ]
         ]),
         _vue.createElementVNode("button", {
-            onClick: _cache[3] || (_cache[3] = (...args)=>_ctx.removeButtonClickHandler && _ctx.removeButtonClickHandler(...args)
+            onClick: _cache[4] || (_cache[4] = (...args)=>_ctx.removeButtonClickHandler && _ctx.removeButtonClickHandler(...args)
             )
         }, _hoisted_3)
     ]);
@@ -10773,9 +10891,11 @@ function render(_ctx, _cache) {
                         (_vue.openBlock(true), _vue.createElementBlock(_vue.Fragment, null, _vue.renderList(_ctx.globalState.players, (player)=>{
                             return _vue.openBlock(), _vue.createBlock(_component_player_list_item, {
                                 key: player.id,
-                                player: player
+                                player: player,
+                                addNewPlayer: _ctx.addPlayerButttonHandler
                             }, null, 8 /* PROPS */ , [
-                                "player"
+                                "player",
+                                "addNewPlayer"
                             ]);
                         }), 128 /* KEYED_FRAGMENT */ ))
                     ]

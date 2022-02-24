@@ -1,6 +1,6 @@
 import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
-import { calculatePlayersRanks, calculatePlayersScore, calculateScore } from "./util/helper";
+import { calculatePlayersRanks, calculatePlayersScore, calculateScore, getActivePlayer } from "./util/helper";
 import { Player } from "./util/types";
 
 const store = {
@@ -12,20 +12,20 @@ const store = {
         shotsHistory: [],
     }),
     getters: {
-        players() {
-            return store.state.players;
-        },
         findPlayer(id) {
             return store.state.players.find((p) => p.id === id);
         },
+        lastPlayer() {
+            if (store.state.shotsHistory.length > 0) {
+                let lastPlayerId = store.state.shotsHistory[store.state.shotsHistory.length - 1].playerId;
+                return this.findPlayer(lastPlayerId);
+            }
+        },
+        activePlayer() {
+            return getActivePlayer(store.state.players);
+        },
     },
     actions: {
-        initShotsHistory: () => {
-            store.state.shotsHistory = [];
-        },
-        initPlayers: () => {
-            store.state.players = [];
-        },
         setActivePlayer: (id) => {
             //Deactivate all the players
             store.state.players.forEach((p) => {
@@ -38,7 +38,8 @@ const store = {
         addShotToPlayer: (playerId, shotValue) => {
             const player = store.getters.findPlayer(playerId);
             player.listOfShots.push(shotValue);
-            store.state.shotsHistory.push([playerId, shotValue]);
+            let shotRecord = { playerId: playerId, value: shotValue };
+            store.state.shotsHistory.push(shotRecord);
         },
         removeShotToPlayer: (playerId) => {
             const player = store.getters.findPlayer(playerId);
@@ -92,7 +93,7 @@ const store = {
 
 watchEffect(() => {
     if (store.state.gameMode === "301") {
-        //Updates the players scores whenever the list of shots changes
+        //Updates the players scores and ranks whenever the list of shots changes
         store.state.players = calculatePlayersScore(store.state.gameMode, store.state.players);
         store.state.players = calculatePlayersRanks(store.state.gameMode, store.state.players);
     }
