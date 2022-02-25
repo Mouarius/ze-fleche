@@ -8,8 +8,8 @@
                 <div v-for="(score, index) in localState.typedShots" :key="index">
                     <span class="result">{{ score ? score : 0 }}</span>
                 </div>
+                <span class="result total">{{ playerShotsTotal }}</span>
             </template>
-            <span class="result total">{{ playerShotsTotal }}</span>
         </div>
         <div class="numpad">
             <button class="number">0</button><button class="number">1</button><button class="number">2</button><button class="number">3</button><button class="number">4</button
@@ -164,6 +164,8 @@ export default {
     font-size: 1.4rem;
     font-weight: 700;
 
+    height: 2rem;
+
     div {
         display: flex;
         flex-direction: row;
@@ -188,8 +190,8 @@ export default {
         margin: 0 0.5rem;
     }
     .total {
-        background-color: v.$color-primary;
-        color: white;
+        background-color: v.$color-secondary;
+        color: v.$color-secondary-dark;
     }
 }
 .game-pad {
