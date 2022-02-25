@@ -69,12 +69,9 @@ export default {
     border-radius: 0.7rem;
     padding: 0.2rem 0.8rem;
     margin: 0.2rem 0;
+    height: 1.8rem;
 
     color: v.$color-text-white;
-
-    &.active {
-        background: rgba($color: #ffffff, $alpha: 0.1);
-    }
 
     .rank {
         margin-left: 0.6rem;
