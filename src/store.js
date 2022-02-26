@@ -1,6 +1,6 @@
 import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
-import { calculatePlayersRanks, calculatePlayersScore, calculateScore, getActivePlayer } from "./util/helper";
+import { calculatePlayersRanks, calculatePlayersScore, calculateScore, calculateShotValue, getActivePlayer } from "./util/helper";
 import { Player } from "./util/types";
 
 const store = {
@@ -37,6 +37,13 @@ const store = {
         },
         addShotToPlayer: (playerId, shotValue) => {
             const player = store.getters.findPlayer(playerId);
+            //TODO : Verify if the score exceeds the total of points
+            const currentScore = player.score;
+            const calculatedShotValue = calculateShotValue(shotValue);
+            if (currentScore - calculatedShotValue < 0) {
+                //Undo the shot
+                console.log("Too bad !");
+            }
             player.listOfShots.push(shotValue);
             let shotRecord = { playerId: playerId, value: shotValue };
             store.state.shotsHistory.push(shotRecord);

@@ -6,23 +6,34 @@ export const wait = (duration) =>
         return setTimeout(() => resolve(), duration);
     });
 
+/**
+ * @param  {string} shotString
+ * Returns the parsed calculate number value of a shot in string format
+ * @example
+ * calculateShotValue("T4") = 3 * 4 //T = 3, D = 2
+ * @returns {number}
+ */
+export const calculateShotValue = (shotString) => {
+    //Separates the value and the modifier letter
+
+    const matchResult = shotString.match(/(\D)?(\d+)/);
+    const [, modifier, number] = matchResult;
+    let calculatedScore = parseInt(number);
+    if (modifier === "T") {
+        calculatedScore = calculatedScore * 3;
+    } else if (modifier === "D") {
+        calculatedScore = calculatedScore * 2;
+    }
+    return calculatedScore;
+};
+
 export const calculateScore = (gameMode, listOfShots) => {
     let baseScore = 0;
     let sumOfShots = 0;
 
     if (listOfShots.length > 0) {
-        sumOfShots = listOfShots.reduce((acc, strVal) => {
-            //Separates the value and the modifier letter
-            const matchResult = strVal.match(/(\D)?(\d+)/);
-            const [, modifier, strValue] = matchResult;
-            let numberValue = parseInt(strValue);
-
-            if (modifier === "T") {
-                numberValue = numberValue * 3;
-            } else if (modifier === "D") {
-                numberValue = numberValue * 2;
-            }
-            return acc + numberValue;
+        sumOfShots = listOfShots.reduce((acc, shotString) => {
+            return acc + calculateShotValue(shotString);
         }, 0);
     }
 
