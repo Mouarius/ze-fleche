@@ -1,9 +1,9 @@
 <template>
     <section class="players-list">
         <h2>Joueurs</h2>
-        <ul>
+        <ul @keyup.tab="addNewPlayer">
             <transition-group name="fade">
-                <player-list-item v-for="player in globalState.players" :key="player.id" :player="player" :addNewPlayer="addPlayerButttonHandler" />
+                <player-list-item v-for="player in globalState.players" :key="player.id" :player="player" />
             </transition-group>
 
             <li class="add-player">
@@ -29,6 +29,9 @@ export default {
         addPlayerButttonHandler() {
             console.log("Add player triggered.");
 
+            store.addPlayerAction();
+        },
+        addNewPlayer() {
             store.addPlayerAction();
         },
     },

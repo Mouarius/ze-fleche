@@ -4,7 +4,7 @@
     "description": "Une application de comptage de points pour un jeu de fléchettes.",
     "source": "src/index.html",
     "scripts": {
-        "start": "parcel",
+        "start": "parcel src/index.html",
         "build": "parcel build src/index.html"
     },
     "keywords": [],

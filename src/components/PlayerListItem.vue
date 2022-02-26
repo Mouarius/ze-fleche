@@ -1,17 +1,8 @@
 <template>
     <li>
-        <button><img class="burger-icon" src="../assets/burger-icon.svg" /></button>
-        <input
-            @keyup.enter="unFocus"
-            @keyup.tab.prevent="addNewPlayer"
-            ref="playerNameInput"
-            type="text"
-            @change="onNameInputChangeHandler"
-            class="player-name"
-            v-model="playerName"
-            placeholder="Joueur"
-        />
-        <button @click="removeButtonClickHandler"><img class="cross-icon" src="../assets/cross.svg" /></button>
+        <button tabindex="-1"><img class="burger-icon" src="../assets/burger-icon.svg" /></button>
+        <input @keyup.enter="unFocus" ref="playerNameInput" type="text" @change="onNameInputChangeHandler" class="player-name" v-model="playerName" placeholder="Joueur" />
+        <button tabindex="-1" @click="removeButtonClickHandler"><img class="cross-icon" src="../assets/cross.svg" /></button>
     </li>
 </template>
 
@@ -20,7 +11,7 @@ import store from "../store";
 
 export default {
     name: "PlayerListItem",
-    props: ["player", "addNewPlayer"],
+    props: ["player"],
     data() {
         return {
             playerName: "",
