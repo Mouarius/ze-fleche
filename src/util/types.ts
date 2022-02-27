@@ -11,3 +11,5 @@ export interface ShotRecord {
     playerId: number;
     value: string;
 }
+
+export type Shot = String;
