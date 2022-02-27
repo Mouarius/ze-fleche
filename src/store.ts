@@ -1,21 +1,22 @@
 import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
-import { calculatePlayersRanks, calculatePlayersScore, calculateScore, calculateShotValue, getActivePlayer } from "./util/helper";
-import { Player } from "./util/types";
+import { calculatePlayersRanks, calculatePlayersScore, getActivePlayer, setNextPlayerActive } from "./util/helper";
+import logger from "./util/logger";
+import { Player, ShotRecord } from "./util/types";
 
 const store = {
     debug: true,
     state: reactive({
-        players: initialPlayers,
+        players: initialPlayers as Player[],
         gameMode: "301",
         inGame: false,
-        shotsHistory: [],
+        shotsHistory: [] as ShotRecord[],
     }),
     getters: {
-        findPlayer(id) {
+        findPlayer(id: number): Player {
             return store.state.players.find((p) => p.id === id);
         },
-        lastPlayer() {
+        lastPlayer(): Player {
             if (store.state.shotsHistory.length > 0) {
                 let lastPlayerId = store.state.shotsHistory[store.state.shotsHistory.length - 1].playerId;
                 return this.findPlayer(lastPlayerId);
@@ -24,9 +25,12 @@ const store = {
         activePlayer() {
             return getActivePlayer(store.state.players);
         },
+        changeGlobalGameMode(gameMode) {
+            this.state.gameMode = gameMode;
+        },
     },
     actions: {
-        setActivePlayer: (id) => {
+        setActivePlayer: (id: number) => {
             //Deactivate all the players
             store.state.players.forEach((p) => {
                 p.isActive = false;
@@ -35,27 +39,45 @@ const store = {
             const playerToActivate = store.getters.findPlayer(id);
             playerToActivate.isActive = true;
         },
-        addShotToPlayer: (playerId, shotValue) => {
+        addShotToPlayer: (playerId: number, shotValue: string) => {
             const player = store.getters.findPlayer(playerId);
-            //TODO : Verify if the score exceeds the total of points
-            const currentScore = player.score;
-            const calculatedShotValue = calculateShotValue(shotValue);
-            if (currentScore - calculatedShotValue < 0) {
-                //Undo the shot
-                console.log("Too bad !");
-            }
+
             player.listOfShots.push(shotValue);
             let shotRecord = { playerId: playerId, value: shotValue };
             store.state.shotsHistory.push(shotRecord);
         },
-        removeShotToPlayer: (playerId) => {
+        removeShotToPlayer: (playerId: number): ShotRecord => {
             const player = store.getters.findPlayer(playerId);
             player.listOfShots.pop();
-            store.state.shotsHistory.pop();
+            return store.state.shotsHistory.pop();
         },
-        editPlayerName: (playerId, newName) => {
+        editPlayerName: (playerId: number, newName: string) => {
             const playerToEdit = store.getters.findPlayer(playerId);
             playerToEdit.name = newName;
+        },
+        abortCurrentPlayerShots: (playerId: number) => {
+            const numberOfCurrentShots = store.state.shotsHistory.length % 3;
+            const shotsToAdd = 3 - numberOfCurrentShots;
+            //Abort the current shots
+
+            const currentShots: ShotRecord[] = [];
+            for (let i = 0; i < numberOfCurrentShots; i++) {
+                const currentShot = store.actions.removeShotToPlayer(playerId);
+                currentShots.push(currentShot);
+            }
+            //Append X to the current shots to signify that they were invalid
+            currentShots.forEach((shotRecord) => {
+                shotRecord.value = shotRecord.value + "X";
+            });
+            //Re append the modified shots in reverse order
+            currentShots.reverse().forEach((shotRecord) => {
+                store.actions.addShotToPlayer(playerId, shotRecord.value);
+            });
+            //Adds invalid shots to the rest
+            for (let i = 0; i < shotsToAdd; i++) {
+                store.actions.addShotToPlayer(playerId, "X");
+            }
+            setNextPlayerActive(store.state.players);
         },
     },
 
@@ -76,25 +98,6 @@ const store = {
     },
     removePlayerAction(playerId) {
         this.state.players = this.state.players.filter((p) => p.id !== playerId);
-    },
-    changeGlobalGameModeAction(gameMode) {
-        this.state.gameMode = gameMode;
-    },
-    updatePlayerScoreAction(playerId, updatedScore) {
-        const playerToUpdate = this.getters.findPlayer(this.state, playerId);
-        playerToUpdate.score = updatedScore;
-    },
-    addShotToPlayerAction(playerId, shot) {
-        const player = this.getters.findPlayer(this.state, playerId);
-        if (player) {
-            player.listOfShots.push(shot);
-        }
-    },
-    removeLastShotToPlayerAction(playerId) {
-        const player = this.getters.findPlayer(this.state, playerId);
-        if (player) {
-            player.listOfShots.pop();
-        }
     },
 };
 

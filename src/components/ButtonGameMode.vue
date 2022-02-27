@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         buttonClickHandler() {
-            store.changeGlobalGameModeAction(this.buttonGameMode);
+            store.actions.changeGlobalGameMode(this.buttonGameMode);
         },
     },
 };

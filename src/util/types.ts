@@ -6,3 +6,8 @@ export class Player {
     listOfShots = [];
     rank = 1;
 }
+
+export interface ShotRecord {
+    playerId: number;
+    value: string;
+}

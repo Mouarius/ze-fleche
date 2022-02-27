@@ -27,7 +27,19 @@
     </div>
 </template>
 <script>
-import { calculateScore, getActivePlayer, getNextPlayer, getPlayerLastShots, getPreviousPlayer, getPreviousPlayerIndex, getPreviousPlayerInHistory, wait } from "../../util/helper";
+import {
+    calculateScore,
+    calculateShotValue,
+    calculateSumOfShots,
+    getActivePlayer,
+    getNextPlayer,
+    getPlayerLastShots,
+    getPreviousPlayer,
+    getPreviousPlayerIndex,
+    getPreviousPlayerInHistory,
+    setNextPlayerActive,
+    wait,
+} from "../../util/helper";
 import store from "../../store";
 import logger from "../../util/logger";
 
@@ -49,7 +61,7 @@ export default {
         },
 
         playerShotsTotal() {
-            return calculateScore(null, this.localState.typedShots);
+            return calculateSumOfShots(this.localState.typedShots);
         },
         scoreModifierSymbol() {
             if (this.localState.scoreModifier) {
@@ -66,10 +78,27 @@ export default {
     },
     methods: {
         addShot(shotValue) {
-            let calculatedShotValue = this.scoreModifierSymbol + shotValue;
+            //Adds the eventual score modifier to the registered shotValue
+            let parsedShotValue = this.scoreModifierSymbol + shotValue;
             this.localState.scoreModifier = "";
-            this.localState.typedShots.push(calculatedShotValue);
-            store.actions.addShotToPlayer(this.activePlayer.id, calculatedShotValue);
+
+            let calculatedShotValue = calculateShotValue(parsedShotValue);
+
+            //Check if the added shots exceeds the score
+            const player = store.getters.findPlayer(this.activePlayer.id);
+            const currentScore = player.score;
+
+            if (currentScore - calculatedShotValue < 0) {
+                //Abort the three actual shots of the player
+                store.actions.abortCurrentPlayerShots(player.id);
+                this.localState.typedShots = [];
+            } else {
+                if (currentScore - calculatedShotValue === 0) {
+                    logger.info(player.name + " has won the game !");
+                }
+                store.actions.addShotToPlayer(player.id, parsedShotValue);
+                this.localState.typedShots.push(parsedShotValue);
+            }
         },
         removeLastShot() {
             if (this.localState.typedShots.length > 0) {
@@ -79,10 +108,10 @@ export default {
             }
         },
         numberButtonClickHandler(e) {
-            const typedValue = e.target.textContent;
-            logger.info(`${this.activePlayer.name} did a ${typedValue}`);
+            const buttonValue = e.target.textContent;
+            logger.info(`${this.activePlayer.name} did a ${buttonValue}`);
             if (this.localState.typedShots.length < 3) {
-                this.addShot(typedValue);
+                this.addShot(buttonValue);
                 if (this.localState.typedShots.length === 3) {
                     this.moveToNextPlayer();
                 }
@@ -102,12 +131,8 @@ export default {
         moveToNextPlayer() {
             logger.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
             wait(100).then(() => {
-                logger.info("We have waited for 1s, switching to next player");
-                const nextPlayer = getNextPlayer(this.globalState.players);
-                if (nextPlayer) {
-                    store.actions.setActivePlayer(nextPlayer.id);
-                    this.localState.typedShots = [];
-                }
+                this.localState.typedShots = [];
+                setNextPlayerActive(this.globalState.players);
             });
         },
         moveToPreviousPlayer() {
@@ -122,27 +147,6 @@ export default {
             }
         },
     },
-    // watch: {
-    //     allShotsFired(newValue, oldValue) {
-    //         if (newValue) {
-    //             logger.info(`All shots have been fired for ${this.activePlayer.name}`);
-    //             wait(1000).then(() => {
-    //                 logger.info("We have waited for 1s, switching to another player");
-    //                 const nextPlayer = this.globalState.players[getNextPlayerIndex(this.globalState.players)];
-    //                 if (nextPlayer) {
-    //                     store.actions.setActivePlayer(nextPlayer.id);
-    //                     this.localState.typedShots = [];
-    //                 }
-    //             });
-    //         }
-    //     },
-    //     activePlayer(newVal, oldVal) {
-    //         console.log("Active player changed");
-    //         let lastShots = getPlayerLastShots(this.activePlayer);
-    //         console.log("🚀 ~ file: GamePad.vue ~ line 123 ~ activePlayer ~ lastShots", lastShots);
-    //         this.localState.playerShots = lastShots;
-    //     },
-    // },
     mounted() {
         logger.info("Mounting GamePad");
         document.querySelectorAll("button.number").forEach((item) => {

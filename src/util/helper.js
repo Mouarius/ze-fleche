@@ -14,8 +14,10 @@ export const wait = (duration) =>
  * @returns {number}
  */
 export const calculateShotValue = (shotString) => {
+    if (!shotString || shotString.includes("X")) {
+        return 0;
+    }
     //Separates the value and the modifier letter
-
     const matchResult = shotString.match(/(\D)?(\d+)/);
     const [, modifier, number] = matchResult;
     let calculatedScore = parseInt(number);
@@ -27,8 +29,7 @@ export const calculateShotValue = (shotString) => {
     return calculatedScore;
 };
 
-export const calculateScore = (gameMode, listOfShots) => {
-    let baseScore = 0;
+export const calculateSumOfShots = (listOfShots) => {
     let sumOfShots = 0;
 
     if (listOfShots.length > 0) {
@@ -36,11 +37,17 @@ export const calculateScore = (gameMode, listOfShots) => {
             return acc + calculateShotValue(shotString);
         }, 0);
     }
+    return sumOfShots;
+};
+
+export const calculateScore = (gameMode, listOfShots) => {
+    let baseScore = 0;
+    const sumOfShots = calculateSumOfShots(listOfShots);
 
     if (gameMode === "301") {
-        baseScore = 301;
+        baseScore = 10;
     }
-    return Math.abs(baseScore - sumOfShots);
+    return baseScore - sumOfShots;
 };
 
 export const calculatePlayersScore = (gameMode, players) => {
@@ -90,6 +97,14 @@ export const getPreviousPlayerIndex = (players) => {
         return activePlayerIndex - 1;
     }
     return players.length - 1;
+};
+
+export const setNextPlayerActive = (players) => {
+    // logger.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
+    const nextPlayer = getNextPlayer(players);
+    if (nextPlayer) {
+        store.actions.setActivePlayer(nextPlayer.id);
+    }
 };
 
 export const getNextPlayer = (players) => {
