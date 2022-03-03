@@ -11,6 +11,7 @@ const store = {
         gameMode: "301",
         inGame: false,
         shotsHistory: [] as ShotRecord[],
+        winner: null,
     }),
     getters: {
         findPlayer(id: number): Player {
@@ -30,6 +31,13 @@ const store = {
         },
     },
     actions: {
+        win: (playerId: number) => {
+            let player = store.getters.findPlayer(playerId);
+            if (player) {
+                player.winner = true;
+                store.state.winner = player;
+            }
+        },
         setActivePlayer: (id: number) => {
             //Deactivate all the players
             store.state.players.forEach((p) => {

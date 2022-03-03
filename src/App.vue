@@ -16,6 +16,25 @@
             </footer>
         </div>
         <game-page v-else />
+        <div v-if="globalState.winner" class="win-announcer">
+            <div class="center-window">
+                <em>{{ globalState.winner.name }}</em>
+                <div>has won the game !</div>
+            </div>
+            <div class="win">
+                <ul class="rays">
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                    <li class="ray"></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -31,12 +50,18 @@ export default {
     data() {
         return {
             globalState: store.state,
-            localState: {},
+            localState: {
+                win: false,
+            },
         };
     },
     methods: {
         startGameButtonHandler() {
             return store.toggleIngameAction();
+        },
+        playWinAnimation() {
+            console.log("Wiiiin !");
+            this.localState.win = true;
         },
     },
     mounted() {
@@ -49,6 +74,81 @@ export default {
 
 <style lang="scss">
 @use "styles/variables" as v;
+.win-announcer {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.37);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    .center-window {
+        display: block;
+        z-index: 50;
+        background: white;
+        padding: 2.2rem 1.8rem;
+        border-radius: 2.8rem;
+        text-align: center;
+        justify-content: center;
+        flex-direction: column;
+        color: v.$color-primary-dark;
+        font-weight: 600;
+        font-size: 1.4rem;
+        em {
+            display: block;
+            color: v.$color-primary;
+            font-size: 2.4rem;
+            margin-bottom: 0.6rem;
+        }
+    }
+}
+.win {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    animation: rotation 20s linear infinite;
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    .rays {
+        position: relative;
+        z-index: 1;
+
+        // align-items: center;
+        // justify-content: center;
+
+        transform: translate(50vw, 50vh);
+        .ray {
+            transform-origin: left;
+
+            @for $counter from 1 through 9 {
+                &:nth-child(#{$counter}) {
+                    transform: rotate($counter * 40deg);
+                }
+            }
+            width: 0;
+            height: 0;
+            top: -100px;
+            border-top: 100px solid transparent;
+            border-right: 600px solid rgba($color: v.$color-secondary, $alpha: 0.9);
+            border-bottom: 100px solid transparent;
+            list-style-type: none;
+            position: absolute;
+        }
+    }
+}
 
 .game-page {
     position: relative;

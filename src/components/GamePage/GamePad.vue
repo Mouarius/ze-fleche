@@ -95,6 +95,7 @@ export default {
             } else {
                 if (currentScore - calculatedShotValue === 0) {
                     logger.info(player.name + " has won the game !");
+                    store.actions.win(player.id);
                 }
                 store.actions.addShotToPlayer(player.id, parsedShotValue);
                 this.localState.typedShots.push(parsedShotValue);

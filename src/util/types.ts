@@ -5,6 +5,7 @@ export class Player {
     isActive = false;
     listOfShots = [];
     rank = 1;
+    winner = false;
 }
 
 export interface ShotRecord {
