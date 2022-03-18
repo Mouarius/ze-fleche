@@ -35,6 +35,7 @@
                 </ul>
             </div>
         </div>
+        <score-list />
     </div>
 </template>
 
@@ -42,10 +43,11 @@
 import ButtonGameMode from "./components/ButtonGameMode.vue";
 import GamePage from "./components/GamePage/GamePage.vue";
 import PlayersList from "./components/PlayersList.vue";
+import ScoreList from "./components/Debug/ScoreList.vue";
 import store from "./store";
 
 export default {
-    components: { ButtonGameMode, PlayersList, GamePage },
+    components: { ButtonGameMode, PlayersList, GamePage, ScoreList },
     name: "App",
     data() {
         return {
