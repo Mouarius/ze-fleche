@@ -103,7 +103,7 @@ export default {
         },
         removeLastShot() {
             if (this.localState.typedShots.length > 0) {
-                logger.info(`Removing last shot from ${this.activePlayer.name}`);
+                logger.debug(`Removing last shot from ${this.activePlayer.name}`);
                 this.localState.typedShots.pop();
                 store.actions.removeShotToPlayer(this.activePlayer.id);
             }

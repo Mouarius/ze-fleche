@@ -1,8 +1,8 @@
 import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
 import { ShotHistory, Volley } from "./data/ShotHistory";
-import { calculatePlayersRanks, calculatePlayersScore, getActivePlayer, setNextPlayerActive } from "./util/helper";
-import logger from "./util/logger";
+import { getActivePlayer, setNextPlayerActive } from "./util/helper";
+import { calculatePlayersRanks, calculatePlayersScore } from "./util/helper";
 import { Player, ShotRecord } from "./util/types";
 
 const store = {
@@ -55,33 +55,24 @@ const store = {
         },
         addShotToPlayer: (playerId: number, shotValue: string) => {
             const player = store.getters.findPlayer(playerId);
-            const currentVolley = store.state.shotHistory.lastVolley;
-            //TODO Simplify and refactor
-            if (!currentVolley) {
-                store.state.shotHistory.push([shotValue]);
-            } else {
-                if (currentVolley.length === 3) {
-                    store.state.shotHistory.push([shotValue]);
-                } else {
-                    const newVolley = [...currentVolley];
-                    newVolley.push(shotValue);
-                    store.state.shotHistory.setVolley(newVolley, playerId, store.state.shotHistory.currentTurn);
-                }
-            }
-
+            //TODO Remove the implementations of the old shotsHistory
+            store.state.shotHistory.pushShot(shotValue);
             player.listOfShots.push(shotValue);
+            //!Deprecated
             let shotRecord = { playerId: playerId, value: shotValue };
             store.state.shotsHistory.push(shotRecord);
         },
         removeShotToPlayer: (playerId: number): ShotRecord => {
             const player = store.getters.findPlayer(playerId);
             player.listOfShots.pop();
-            return store.state.shotsHistory.pop();
+            store.state.shotsHistory.pop();
+            return store.state.shotHistory.popShot();
         },
         editPlayerName: (playerId: number, newName: string) => {
             const playerToEdit = store.getters.findPlayer(playerId);
             playerToEdit.name = newName;
         },
+        //TODO Implementing abort player shots for shotHistory
         abortCurrentPlayerShots: (playerId: number) => {
             const numberOfCurrentShots = store.state.shotsHistory.length % 3;
             const shotsToAdd = 3 - numberOfCurrentShots;

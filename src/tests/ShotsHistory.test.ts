@@ -38,11 +38,35 @@ describe("SHOTS HISTORY", () => {
             expect(hist.state.length).toBe(2);
             expect(hist.state).toEqual([[0, 1, 2], [["1", "1", "1"]]]);
         });
+        it("append a shotValue to the history when the last volley is full", () => {
+            hist.pushShot("2");
+            expect(hist.state.length).toBe(2);
+            expect(hist.state).toEqual([
+                [0, 1, 2],
+                [["1", "1", "1"], ["2"]],
+            ]);
+        });
+        it("append a shotValue to the history when the last volley is not full", () => {
+            hist.pushShot("3");
+            expect(hist.state).toStrictEqual([
+                [0, 1, 2],
+                [
+                    ["1", "1", "1"],
+                    ["2", "3"],
+                ],
+            ]);
+        });
+
         it("pop a volley from the history", () => {
             hist.pop();
-            expect(hist.state).toHaveLength(1);
+            expect(hist.state).toHaveLength(2);
+        });
+        it("pop a shot from the history", () => {
+            hist.popShot();
+            expect(hist.state).toStrictEqual([[0, 1, 2], [["1", "1"]]]);
         });
         it("returns the last volley", () => {
+            hist = new ShotHistory(initialPlayers);
             hist.push(["1", "1", "1"]);
             hist.push(["2", "2", "2"]);
 

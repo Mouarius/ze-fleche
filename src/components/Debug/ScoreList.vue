@@ -65,9 +65,7 @@ export default {
                     //if i%3 != 0 then acc = acc + curr
                     //else
                     let playerId = curr.playerId;
-                    console.log("acc", acc);
-                    console.log("playerId", playerId);
-                    console.log("curr", curr);
+
                     if (!acc[playerId]) {
                         acc[playerId] = [];
                     }

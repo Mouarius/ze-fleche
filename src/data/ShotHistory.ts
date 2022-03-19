@@ -84,6 +84,7 @@ export class ShotHistory {
             })
             .slice(1);
     }
+
     setVolley(volleyValue, playerId: number, turn: number): void {
         // logger.debug(`Adding a new volley at turn ${turn} for player number ${playerId}`);
         if (!this.state[turn]) this.state.push([]);
@@ -99,10 +100,28 @@ export class ShotHistory {
         const nextPlayerIndex = currentPlayer.index === this.players.length - 1 ? 0 : currentPlayer.index + 1;
         this.setVolley(volley, nextPlayerIndex, turn);
     }
+    pushShot(shotValue: string) {
+        const currentVolley = this.lastVolley;
+        if (currentVolley) {
+            if (currentVolley.length < 3) {
+                const updatedVolley = currentVolley.concat([shotValue]);
+                this.setVolley(updatedVolley, this.currentPlayer.index, this.currentTurn);
+            } else {
+                this.push([shotValue]);
+            }
+        } else {
+            this.push([shotValue]);
+        }
+    }
     pop() {
-        const lastVolley = this.state[this.state.length - 1];
-        lastVolley.pop();
+        const lastTurn = this.state[this.state.length - 1];
+        lastTurn.pop();
         if (this.state[this.state.length - 1].length === 0 && this.state.length > 1) this.state.pop();
+    }
+    popShot() {
+        if (this.lastVolley) {
+            return this.lastVolley.pop();
+        }
     }
 }
 

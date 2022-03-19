@@ -8,7 +8,7 @@ export default {
     },
     debug(message) {
         if (store.debug) {
-            console.log(`DEBUG - `, message);
+            console.debug(`DEBUG - `, message);
         }
     },
 };
