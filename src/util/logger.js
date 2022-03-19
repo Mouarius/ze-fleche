@@ -6,4 +6,9 @@ export default {
             console.log(`INFO - `, message);
         }
     },
+    debug(message) {
+        if (store.debug) {
+            console.log(`DEBUG - `, message);
+        }
+    },
 };
