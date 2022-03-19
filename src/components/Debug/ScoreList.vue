@@ -85,7 +85,9 @@ export default {
 .score-list {
     display: block;
     position: fixed;
-    width: 100px;
+    top: 20px;
+    left: 20px;
+    width: auto !important;
     border: solid black 1px;
     padding: 8px;
     background: white;
@@ -96,6 +98,7 @@ export default {
     table,
     th,
     td {
+        min-width: 32px;
         margin: 2px;
         border: solid 1px;
         padding: 4px;

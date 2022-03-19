@@ -1,0 +1,10 @@
+{
+    "typeAcquisition": {
+        "include": ["jest"]
+    },
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "target": "ESNEXT"
+    }
+}
