@@ -42,5 +42,19 @@ describe("SHOTS HISTORY", () => {
             hist.pop();
             expect(hist.state).toHaveLength(1);
         });
+        it("returns the last volley", () => {
+            hist.push(["1", "1", "1"]);
+            hist.push(["2", "2", "2"]);
+
+            expect(hist.lastVolley).toStrictEqual(["2", "2", "2"]);
+            expect(hist.state.length).toBe(2);
+            expect(hist.state).toEqual([
+                [0, 1, 2],
+                [
+                    ["1", "1", "1"],
+                    ["2", "2", "2"],
+                ],
+            ]);
+        });
     });
 });

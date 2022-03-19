@@ -32,7 +32,7 @@ const initialHistory = [
 ];
 
 export class ShotHistory {
-    state: (String | number)[][];
+    state;
     constructor(players: Player[]) {
         this.state = [];
         if (players.length > 0) {
@@ -58,6 +58,12 @@ export class ShotHistory {
         const currentTurn = this.state.length - 1;
         const currentPlayerIndex = this.state[currentTurn].length > 0 ? this.state[currentTurn].length - 1 : 0;
         return { index: currentPlayerIndex, playerId: this.state[0][currentPlayerIndex] };
+    }
+    get lastVolley() {
+        if (this.state.length > 1) {
+            return this.state[this.state.length - 1].slice(-1)[0];
+        }
+        return null;
     }
 
     getVolley(playerId, turn) {

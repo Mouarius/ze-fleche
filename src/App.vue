@@ -59,7 +59,7 @@ export default {
     },
     methods: {
         startGameButtonHandler() {
-            return store.toggleIngameAction();
+            store.actions.initializeGame();
         },
         playWinAnimation() {
             console.log("Wiiiin !");

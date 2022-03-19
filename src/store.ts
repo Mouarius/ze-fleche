@@ -1,5 +1,6 @@
 import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
+import { ShotHistory, Volley } from "./data/ShotHistory";
 import { calculatePlayersRanks, calculatePlayersScore, getActivePlayer, setNextPlayerActive } from "./util/helper";
 import logger from "./util/logger";
 import { Player, ShotRecord } from "./util/types";
@@ -11,6 +12,7 @@ const store = {
         gameMode: "301",
         inGame: false,
         shotsHistory: [] as ShotRecord[],
+        shotHistory: new ShotHistory(initialPlayers),
         winner: null,
     }),
     getters: {
@@ -31,6 +33,10 @@ const store = {
         },
     },
     actions: {
+        initializeGame() {
+            store.state.inGame = true;
+            store.state.shotHistory = new ShotHistory(store.state.players);
+        },
         win: (playerId: number) => {
             let player = store.getters.findPlayer(playerId);
             if (player) {
@@ -49,6 +55,19 @@ const store = {
         },
         addShotToPlayer: (playerId: number, shotValue: string) => {
             const player = store.getters.findPlayer(playerId);
+            const currentVolley = store.state.shotHistory.lastVolley;
+            //TODO Simplify and refactor
+            if (!currentVolley) {
+                store.state.shotHistory.push([shotValue]);
+            } else {
+                if (currentVolley.length === 3) {
+                    store.state.shotHistory.push([shotValue]);
+                } else {
+                    const newVolley = [...currentVolley];
+                    newVolley.push(shotValue);
+                    store.state.shotHistory.setVolley(newVolley, playerId, store.state.shotHistory.currentTurn);
+                }
+            }
 
             player.listOfShots.push(shotValue);
             let shotRecord = { playerId: playerId, value: shotValue };
