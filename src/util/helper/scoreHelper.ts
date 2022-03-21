@@ -1,5 +1,5 @@
 import { ShotHistory } from "../../data/ShotHistory";
-import { Shot } from "../types";
+import { Player, Shot } from "../types";
 
 /**
  * Returns the parsed calculate number value of a shot in string format
@@ -8,20 +8,23 @@ import { Shot } from "../types";
  * calculateShotValue("T4") = 3 * 4 //T = 3, D = 2
  * @returns {number}
  */
-export const calculateShotValue = (shotString: Shot): number => {
-    if (!shotString || shotString.includes("X")) {
-        return 0;
+export const calculateShotValue = (shotString: String): number => {
+    if (shotString) {
+        if (shotString.includes("X")) {
+            return 0;
+        }
+        const matchResult = shotString.match(/(\D)?(\d+)/);
+        const [, modifier, number] = matchResult;
+        let calculatedScore = parseInt(number);
+        if (modifier === "T") {
+            calculatedScore = calculatedScore * 3;
+        } else if (modifier === "D") {
+            calculatedScore = calculatedScore * 2;
+        }
+        return calculatedScore;
     }
+    return 0;
     //Separates the value and the modifier letter
-    const matchResult = shotString.match(/(\D)?(\d+)/);
-    const [, modifier, number] = matchResult;
-    let calculatedScore = parseInt(number);
-    if (modifier === "T") {
-        calculatedScore = calculatedScore * 3;
-    } else if (modifier === "D") {
-        calculatedScore = calculatedScore * 2;
-    }
-    return calculatedScore;
 };
 
 /**
@@ -31,9 +34,12 @@ export const calculateShotValue = (shotString: Shot): number => {
  */
 export const calculateSumOfShots = (listOfShots: Shot[]): number => {
     let sumOfShots = 0;
+    let flattenListOfShots = listOfShots.flat();
 
-    if (listOfShots.length > 0) {
-        sumOfShots = listOfShots.reduce((acc, shotString) => {
+    if (flattenListOfShots.length > 0) {
+        console.log("listOfShots", listOfShots);
+        console.log("flattenListOfShots", flattenListOfShots);
+        sumOfShots = flattenListOfShots.reduce((acc, shotString) => {
             return acc + calculateShotValue(shotString);
         }, 0);
     }
@@ -56,4 +62,18 @@ export const calculatePlayerScore = (shotHistory: ShotHistory, gameMode: String,
             return baseScore - sumOfShots;
         }
     }
+};
+
+/**
+ * Returns the updated version of players array with the calculated score values depending on the game mode
+ * @param  {String} gameMode
+ * @param  {Player[]} players
+ * @returns Player
+ */
+export const calculatePlayersScore = (shotHistory: ShotHistory, gameMode: String, players: Player[]): Player[] => {
+    // for (let i = 0; i < shotHistory.players.length ; i++) {
+    //     const player =
+    //     player.score = calculateScore(gameMode, player.listOfShots);
+    // }
+    return players;
 };

@@ -17,7 +17,7 @@
     "devDependencies": {
         "@babel/preset-typescript": "^7.16.7",
         "@parcel/transformer-sass": "^2.3.2",
-        "@parcel/transformer-vue": "^2.3.1",
+        "@parcel/transformer-vue": "^2.3.2",
         "@types/jest": "^27.4.1",
         "jest": "^27.5.1",
         "parcel": "^2.3.2",

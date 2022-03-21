@@ -2,7 +2,7 @@ import { reactive, computed, watchEffect } from "vue";
 import initialPlayers from "./data/initialPlayers";
 import { ShotHistory, Volley } from "./data/ShotHistory";
 import { getActivePlayer, setNextPlayerActive } from "./util/helper";
-import { calculatePlayersRanks, calculatePlayersScore } from "./util/helper";
+import { calculatePlayerScore } from "./util/helper/scoreHelper";
 import { Player, ShotRecord } from "./util/types";
 
 const store = {
@@ -26,7 +26,7 @@ const store = {
             }
         },
         activePlayer() {
-            return getActivePlayer(store.state.players);
+            return getActivePlayer(store.state.players)[0];
         },
         changeGlobalGameMode(gameMode) {
             this.state.gameMode = gameMode;
@@ -58,14 +58,10 @@ const store = {
             //TODO Remove the implementations of the old shotsHistory
             store.state.shotHistory.pushShot(shotValue);
             player.listOfShots.push(shotValue);
-            //!Deprecated
-            let shotRecord = { playerId: playerId, value: shotValue };
-            store.state.shotsHistory.push(shotRecord);
         },
         removeShotToPlayer: (playerId: number): ShotRecord => {
             const player = store.getters.findPlayer(playerId);
             player.listOfShots.pop();
-            store.state.shotsHistory.pop();
             return store.state.shotHistory.popShot();
         },
         editPlayerName: (playerId: number, newName: string) => {
@@ -74,28 +70,37 @@ const store = {
         },
         //TODO Implementing abort player shots for shotHistory
         abortCurrentPlayerShots: (playerId: number) => {
-            const numberOfCurrentShots = store.state.shotsHistory.length % 3;
-            const shotsToAdd = 3 - numberOfCurrentShots;
-            //Abort the current shots
-
-            const currentShots: ShotRecord[] = [];
-            for (let i = 0; i < numberOfCurrentShots; i++) {
-                const currentShot = store.actions.removeShotToPlayer(playerId);
-                currentShots.push(currentShot);
-            }
-            //Append X to the current shots to signify that they were invalid
-            currentShots.forEach((shotRecord) => {
-                shotRecord.value = shotRecord.value + "X";
-            });
-            //Re append the modified shots in reverse order
-            currentShots.reverse().forEach((shotRecord) => {
-                store.actions.addShotToPlayer(playerId, shotRecord.value);
-            });
-            //Adds invalid shots to the rest
-            for (let i = 0; i < shotsToAdd; i++) {
-                store.actions.addShotToPlayer(playerId, "X");
-            }
-            setNextPlayerActive(store.state.players);
+            // const lastVolley = store.state.shotHistory.lastVolley;
+            // if (lastVolley && lastVolley.length < 3) {
+            //     const shotsToAdd = 3 - lastVolley.length;
+            //     lastVolley.forEach((shot) => {
+            //         shot = shot + "X";
+            //     });
+            //     for (let i = 0; i < shotsToAdd; i++) {
+            //         lastVolley.push("X");
+            //     }
+            // }
+            // const numberOfCurrentShots = store.state.shotsHistory.length % 3;
+            // const shotsToAdd = 3 - numberOfCurrentShots;
+            // //Abort the current shots
+            // const currentShots: ShotRecord[] = [];
+            // for (let i = 0; i < numberOfCurrentShots; i++) {
+            //     const currentShot = store.actions.removeShotToPlayer(playerId);
+            //     currentShots.push(currentShot);
+            // }
+            // //Append X to the current shots to signify that they were invalid
+            // currentShots.forEach((shotRecord) => {
+            //     shotRecord.value = shotRecord.value + "X";
+            // });
+            // //Re append the modified shots in reverse order
+            // currentShots.reverse().forEach((shotRecord) => {
+            //     store.actions.addShotToPlayer(playerId, shotRecord.value);
+            // });
+            // //Adds invalid shots to the rest
+            // for (let i = 0; i < shotsToAdd; i++) {
+            //     store.actions.addShotToPlayer(playerId, "X");
+            // }
+            // setNextPlayerActive(store.state.players);
         },
     },
 
@@ -119,11 +124,24 @@ const store = {
     },
 };
 
+const updatePlayersShots = (players: Player[]) => {
+    //Update the list of shots for every player object
+    if (players) {
+        players.forEach((player) => {
+            player.listOfShots = store.state.shotHistory.shotsOfPlayer(player.id);
+        });
+        return players;
+    }
+};
 watchEffect(() => {
     if (store.state.gameMode === "301") {
         //Updates the players scores and ranks whenever the list of shots changes
-        store.state.players = calculatePlayersScore(store.state.gameMode, store.state.players);
-        store.state.players = calculatePlayersRanks(store.state.gameMode, store.state.players);
+        // store.state.players = calculatePlayersScore(store.state.gameMode, store.state.players);
+        // store.state.players = calculatePlayersRanks(store.state.gameMode, store.state.players);
+        store.state.players = updatePlayersShots(store.state.players);
+        for (let i = 0; i < store.state.players.length; i++) {
+            store.state.players[i].score = calculatePlayerScore(store.state.shotHistory, store.state.gameMode, store.state.players[i].id);
+        }
     }
 });
 

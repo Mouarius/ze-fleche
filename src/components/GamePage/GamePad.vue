@@ -26,22 +26,11 @@
         <img class="game-pad-shape" src="../../assets/gamepad-shape.svg" alt="shape" />
     </div>
 </template>
-<script>
-import {
-    calculateScore,
-    calculateShotValue,
-    calculateSumOfShots,
-    getActivePlayer,
-    getNextPlayer,
-    getPlayerLastShots,
-    getPreviousPlayer,
-    getPreviousPlayerIndex,
-    getPreviousPlayerInHistory,
-    setNextPlayerActive,
-    wait,
-} from "../../util/helper";
+<script lang="ts">
+import { getActivePlayer, getPlayerLastShots, getPreviousPlayerInHistory, setNextPlayerActive, wait } from "../../util/helper";
 import store from "../../store";
 import logger from "../../util/logger";
+import { calculatePlayerScore, calculateShotValue, calculateSumOfShots } from "../../util/helper/scoreHelper";
 
 export default {
     name: "GamePad",
@@ -57,9 +46,8 @@ export default {
     },
     computed: {
         activePlayer() {
-            return getActivePlayer(this.globalState.players)[0];
+            return store.getters.activePlayer();
         },
-
         playerShotsTotal() {
             return calculateSumOfShots(this.localState.typedShots);
         },
@@ -78,28 +66,8 @@ export default {
     },
     methods: {
         addShot(shotValue) {
-            //Adds the eventual score modifier to the registered shotValue
-            let parsedShotValue = this.scoreModifierSymbol + shotValue;
-            this.localState.scoreModifier = "";
-
-            let calculatedShotValue = calculateShotValue(parsedShotValue);
-
-            //Check if the added shots exceeds the score
-            const player = store.getters.findPlayer(this.activePlayer.id);
-            const currentScore = player.score;
-
-            if (currentScore - calculatedShotValue < 0) {
-                //Abort the three actual shots of the player
-                store.actions.abortCurrentPlayerShots(player.id);
-                this.localState.typedShots = [];
-            } else {
-                if (currentScore - calculatedShotValue === 0) {
-                    logger.info(player.name + " has won the game !");
-                    store.actions.win(player.id);
-                }
-                store.actions.addShotToPlayer(player.id, parsedShotValue);
-                this.localState.typedShots.push(parsedShotValue);
-            }
+            store.actions.addShotToPlayer(this.activePlayer.id, shotValue);
+            this.localState.typedShots.push(shotValue);
         },
         removeLastShot() {
             if (this.localState.typedShots.length > 0) {
@@ -111,8 +79,25 @@ export default {
         numberButtonClickHandler(e) {
             const buttonValue = e.target.textContent;
             logger.info(`${this.activePlayer.name} did a ${buttonValue}`);
+
             if (this.localState.typedShots.length < 3) {
-                this.addShot(buttonValue);
+                //Check here if he did too much ?
+                let parsedShotValue = this.scoreModifierSymbol + buttonValue;
+                this.localState.scoreModifier = "";
+                let calculatedShotValue = calculateShotValue(parsedShotValue);
+
+                let currentPlayerScore = calculatePlayerScore(this.globalState.shotHistory, "301", this.activePlayer.id);
+
+                if (calculatedShotValue > currentPlayerScore) {
+                    store.actions.abortCurrentPlayerShots(this.activePlayer.id);
+                } else {
+                    if (calculatedShotValue === currentPlayerScore) {
+                        logger.info(this.activePlayer.name + " has won the game !");
+                        store.actions.win(this.activePlayer.id);
+                    }
+                    this.addShot(parsedShotValue);
+                }
+
                 if (this.localState.typedShots.length === 3) {
                     this.moveToNextPlayer();
                 }
