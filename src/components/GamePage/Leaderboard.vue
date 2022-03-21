@@ -39,14 +39,13 @@ export default {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    border: solid 2px red;
     .active-rectangle {
         content: "";
-        display: none;
+        display: block;
         width: 100%;
         position: absolute;
         z-index: 0;
-        background: rgba($color: #ff0000, $alpha: 0.1);
+        background: rgba($color: #ffffff, $alpha: 0.1);
         border-radius: 0.7rem;
         box-sizing: border-box;
         top: 0;

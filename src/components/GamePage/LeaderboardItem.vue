@@ -30,7 +30,7 @@ export default {
                 }
                 return lastShots;
             }
-            return ["&", "é", "s"];
+            return ["", "", ""];
         },
         isActive() {
             return this.player.isActive;
@@ -60,7 +60,6 @@ export default {
         justify-content: flex-end;
         margin-right: 0.6rem;
         flex: 1;
-        min-height: 1.5rem;
         height: 100%;
         .shot {
             background: rgba($color: v.$color-primary-light, $alpha: 0.2);
@@ -72,7 +71,7 @@ export default {
             display: flex;
             align-items: center;
             justify-content: center;
-            // font-size: 0.6em;
+            font-size: 0.6em;
             font-weight: 600;
             margin-left: 0.5rem;
         }
