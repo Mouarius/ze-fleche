@@ -69,11 +69,16 @@ export default {
             store.actions.addShotToPlayer(this.activePlayer.id, shotValue);
             this.localState.typedShots.push(shotValue);
         },
-        removeLastShot() {
-            if (this.localState.typedShots.length > 0) {
-                logger.debug(`Removing last shot from ${this.activePlayer.name}`);
+        handleUndoButton() {
+            if (this.localState.typedShots.length === 0) {
+                let previousPlayer = store.getters.lastPlayer();
+                if (previousPlayer) {
+                    store.actions.setActivePlayer(previousPlayer.id);
+                    this.localState.typedShots = [...previousPlayer.listOfShots.slice(-1)[0]];
+                }
+            } else {
                 this.localState.typedShots.pop();
-                store.actions.removeShotToPlayer(this.activePlayer.id);
+                return store.actions.removeLastShot();
             }
         },
         numberButtonClickHandler(e) {
@@ -104,33 +109,17 @@ export default {
             }
         },
         functionButtonClickHandler(e) {
-            console.log("func");
             if (e.target.id === "undo") {
-                if (this.localState.typedShots.length === 0) {
-                    return this.moveToPreviousPlayer();
-                } else {
-                    return this.removeLastShot();
-                }
+                return this.handleUndoButton();
             }
             return (this.localState.scoreModifier = e.target.id);
         },
         moveToNextPlayer() {
             logger.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
-            wait(100).then(() => {
+            wait(500).then(() => {
                 this.localState.typedShots = [];
                 setNextPlayerActive(this.globalState.players);
             });
-        },
-        moveToPreviousPlayer() {
-            logger.info(`Mistakes have been made, moving to previous player...`);
-            let previousPlayer = getPreviousPlayerInHistory(this.globalState.players, this.globalState.shotsHistory);
-            console.log("🚀 ~ file: GamePad.vue ~ line 113 ~ moveToPreviousPlayer ~ previousPlayer", previousPlayer);
-            if (previousPlayer) {
-                logger.info("Previous player is ", previousPlayer.name);
-                store.actions.setActivePlayer(previousPlayer.id);
-                console.log(this.activePlayer);
-                this.localState.typedShots = [...getPlayerLastShots(this.activePlayer)];
-            }
         },
     },
     mounted() {

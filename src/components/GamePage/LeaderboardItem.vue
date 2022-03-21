@@ -22,9 +22,11 @@ export default {
     computed: {
         lastThreeShots() {
             let lastShots = ["", "", ""];
-            const playerShots = store.state.shotHistory.shotsOfPlayer(this.player.id);
-            if (playerShots.length > 0) {
+            const playerShots = this.player.listOfShots;
+
+            if (playerShots.length > 0 && playerShots.slice(-1)[0]) {
                 const lastVolley = playerShots.slice(-1)[0];
+
                 for (let i = 0; i < lastVolley.length; i++) {
                     lastShots[i] = lastVolley[i];
                 }
@@ -51,7 +53,6 @@ export default {
     padding: 0.2rem 0.8rem;
     margin: 0.2rem 0;
     height: 1.8rem;
-    font-size: 1.5rem;
 
     color: v.$color-text-white;
     .last-shots {

@@ -39,6 +39,7 @@ export default {
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    font-size: 1.4rem;
     .active-rectangle {
         content: "";
         display: block;

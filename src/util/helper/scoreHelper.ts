@@ -29,16 +29,14 @@ export const calculateShotValue = (shotString: String): number => {
 
 /**
  * Returns the numeric value of the sum of the Shots
- * @param  {Shot[]} listOfShots
+ * @param  {String[]} listOfShots
  * @returns number
  */
-export const calculateSumOfShots = (listOfShots: Shot[]): number => {
+export const calculateSumOfShots = (listOfShots: String[]): number => {
     let sumOfShots = 0;
     let flattenListOfShots = listOfShots.flat();
 
     if (flattenListOfShots.length > 0) {
-        console.log("listOfShots", listOfShots);
-        console.log("flattenListOfShots", flattenListOfShots);
         sumOfShots = flattenListOfShots.reduce((acc, shotString) => {
             return acc + calculateShotValue(shotString);
         }, 0);
@@ -54,11 +52,11 @@ export const calculateSumOfShots = (listOfShots: Shot[]): number => {
  */
 export const calculatePlayerScore = (shotHistory: ShotHistory, gameMode: String, playerId: number): number => {
     let baseScore = 0;
-    const playerShots = shotHistory.shotsOfPlayer(playerId);
+    const playerShots = shotHistory.getShotsOfPlayer(playerId);
     if (playerShots) {
         if (gameMode === "301") {
             baseScore = 301;
-            const sumOfShots = calculateSumOfShots(playerShots);
+            const sumOfShots = calculateSumOfShots(playerShots.flat());
             return baseScore - sumOfShots;
         }
     }

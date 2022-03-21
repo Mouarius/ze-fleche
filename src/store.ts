@@ -11,7 +11,7 @@ const store = {
         players: initialPlayers as Player[],
         gameMode: "301",
         inGame: false,
-        shotsHistory: [] as ShotRecord[],
+        // shotsHistory: [] as ShotRecord[],
         shotHistory: new ShotHistory(initialPlayers),
         winner: null,
     }),
@@ -20,16 +20,13 @@ const store = {
             return store.state.players.find((p) => p.id === id);
         },
         lastPlayer(): Player {
-            if (store.state.shotsHistory.length > 0) {
-                let lastPlayerId = store.state.shotsHistory[store.state.shotsHistory.length - 1].playerId;
-                return this.findPlayer(lastPlayerId);
-            }
+            return store.state.players.find((p) => p.id === store.state.shotHistory.currentPlayerId);
         },
         activePlayer() {
             return getActivePlayer(store.state.players)[0];
         },
         changeGlobalGameMode(gameMode) {
-            this.state.gameMode = gameMode;
+            store.state.gameMode = gameMode;
         },
     },
     actions: {
@@ -55,13 +52,9 @@ const store = {
         },
         addShotToPlayer: (playerId: number, shotValue: string) => {
             const player = store.getters.findPlayer(playerId);
-            //TODO Remove the implementations of the old shotsHistory
             store.state.shotHistory.pushShot(shotValue);
-            player.listOfShots.push(shotValue);
         },
-        removeShotToPlayer: (playerId: number): ShotRecord => {
-            const player = store.getters.findPlayer(playerId);
-            player.listOfShots.pop();
+        removeLastShot: () => {
             return store.state.shotHistory.popShot();
         },
         editPlayerName: (playerId: number, newName: string) => {
@@ -128,7 +121,12 @@ const updatePlayersShots = (players: Player[]) => {
     //Update the list of shots for every player object
     if (players) {
         players.forEach((player) => {
-            player.listOfShots = store.state.shotHistory.shotsOfPlayer(player.id);
+            const shotsOfPlayer = store.state.shotHistory.getShotsOfPlayer(player.id);
+            if (shotsOfPlayer) {
+                player.listOfShots = shotsOfPlayer;
+            } else {
+                player.listOfShots = [];
+            }
         });
         return players;
     }
