@@ -4,9 +4,10 @@
     </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import store from "../store";
-export default {
+export default defineComponent({
     name: "ButtonGameMode",
     props: ["buttonGameMode"],
     data() {
@@ -22,10 +23,10 @@ export default {
     },
     methods: {
         buttonClickHandler() {
-            store.actions.changeGlobalGameMode(this.buttonGameMode);
+            store.actions.setGlobalGameMode(this.buttonGameMode);
         },
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>

@@ -10,10 +10,11 @@
         <span class="score">{{ player.score }} <span class="pts">pts</span></span>
     </li>
 </template>
-<script>
+<script lang="ts">
 import store from "../../store";
+import { defineComponent } from "vue";
 
-export default {
+export default defineComponent({
     name: "LeaderboardItem",
     props: ["player"],
     data() {
@@ -39,7 +40,7 @@ export default {
         },
     },
     watch: {},
-};
+});
 </script>
 <style lang="scss" scoped>
 @use "../../styles/variables" as v;

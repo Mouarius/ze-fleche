@@ -130,18 +130,6 @@ export const getPreviousPlayerIndex = (players: Player[]): number => {
     return players.length - 1;
 };
 /**
- * Sets the player after the next player to the new active player
- * @param  {Player[]} players
- * @returns void
- */
-export const setNextPlayerActive = (players: Player[]): void => {
-    // logger.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
-    const nextPlayer = getNextPlayer(players);
-    if (nextPlayer) {
-        store.actions.setActivePlayer(nextPlayer.id);
-    }
-};
-/**
  * Returns the Player object of the player after the active player
  * @param  {Player[]} players
  * @returns Player

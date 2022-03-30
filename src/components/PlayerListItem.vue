@@ -6,10 +6,11 @@
     </li>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import store from "../store";
 
-export default {
+export default defineComponent({
     name: "PlayerListItem",
     props: ["player"],
     data() {
@@ -25,15 +26,15 @@ export default {
         onNameInputChangeHandler() {
             store.actions.editPlayerName(this.player.id, this.playerName);
         },
-        unFocus(e) {
-            e.target.blur();
+        unFocus(e: Event) {
+            (e.target as HTMLElement).blur();
         },
     },
     mounted() {
         this.playerName = this.player.name;
         this.$refs.playerNameInput.focus();
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
