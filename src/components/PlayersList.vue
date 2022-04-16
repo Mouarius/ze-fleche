@@ -13,11 +13,12 @@
     </section>
 </template>
 
-<script>
+<script lang="ts">
 import PlayerListItem from "./PlayerListItem.vue";
 import store from "../store";
+import { defineComponent } from "vue";
 
-export default {
+export default defineComponent({
     components: { PlayerListItem },
     name: "PlayersList",
     data() {
@@ -38,10 +39,10 @@ export default {
     mounted() {
         store.addPlayerAction();
     },
-};
+});
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .players-list {
     position: relative;
     display: flex;

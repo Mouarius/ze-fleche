@@ -5,10 +5,9 @@ export interface ICurrentPlayerReturn {
     index: number;
     playerId: number;
 }
-export type Volley = String[] | [];
+export type Volley = String[];
 
 const initialHistory = [
-    [0, 1, 2],
     [
         ["1", "1", "1"],
         ["2", "2", "2"],
@@ -32,71 +31,105 @@ const initialHistory = [
 ];
 
 export class ShotHistory {
-    state: (String | number)[][];
+    playersId: number[];
+    listOfTurns: Volley[][];
+
     constructor(players: Player[]) {
-        this.state = [];
+        this.listOfTurns = [];
         if (players.length > 0) {
-            this.state[0] = [];
-            players.forEach((player) => {
-                this.state[0].push(player.id);
-            });
+            this.playersId = players.map((player) => player.id);
         }
     }
     get currentTurn() {
-        return this.state.length - 1;
+        return this.listOfTurns.length - 1;
     }
 
-    get players() {
-        return this.state[0];
+    get currentPlayerId() {
+        const currentPlayerIndex = this.listOfTurns[this.currentTurn]?.length - 1;
+        return this.playersId[currentPlayerIndex];
+    }
+    get lastVolley() {
+        if (this.listOfTurns.length > 0) {
+            return this.getLastTurn().slice(-1)[0];
+        }
+        return null;
     }
 
-    get shots() {
-        return this.state.slice(1, -1);
-    }
-
-    get currentPlayer() {
-        const currentTurn = this.state.length - 1;
-        const currentPlayerIndex = this.state[currentTurn].length > 0 ? this.state[currentTurn].length - 1 : 0;
-        return { index: currentPlayerIndex, playerId: this.state[0][currentPlayerIndex] };
+    getLastTurn() {
+        return this.listOfTurns.slice(-1)[0];
     }
 
     getVolley(playerId, turn) {
-        console.log(this.state);
-        return this.state[turn][playerId];
+        if (playerId) {
+            return this.listOfTurns[turn - 1][playerId];
+        }
+        return null;
     }
 
-    turn(turnValue: number) {
-        return this.state[turnValue];
+    getTurn(turnValue: number) {
+        return this.listOfTurns[turnValue - 1];
     }
 
-    shotsOfPlayer(playerId: number) {
-        return this.state
-            .map((row, index) => {
-                if (index > 0) {
-                    return row[playerId];
-                }
-            })
-            .slice(1);
+    getShotsOfPlayer(playerId: number) {
+        const shotsOfPlayer = this.listOfTurns.map((turnRecord) => {
+            if (turnRecord[playerId]) {
+                return turnRecord[playerId];
+            }
+        });
+        return shotsOfPlayer;
     }
     setVolley(volleyValue, playerId: number, turn: number): void {
         // logger.debug(`Adding a new volley at turn ${turn} for player number ${playerId}`);
-        if (!this.state[turn]) this.state.push([]);
-        this.state[turn][playerId] = volleyValue;
+        if (!this.listOfTurns[turn - 1]) this.listOfTurns.push([]);
+        this.listOfTurns[turn - 1][playerId] = volleyValue;
     }
     print() {
-        console.table(this.state);
+        console.table(this.listOfTurns);
     }
     push(volley: Volley) {
-        const currentPlayer = this.currentPlayer;
-        let turn = this.currentTurn;
-        if (currentPlayer.index === this.players.length - 1) turn++;
-        const nextPlayerIndex = currentPlayer.index === this.players.length - 1 ? 0 : currentPlayer.index + 1;
-        this.setVolley(volley, nextPlayerIndex, turn);
+        if (this.listOfTurns.length > 0) {
+            let lastTurn = this.getLastTurn();
+            if (lastTurn) {
+                if (lastTurn.length === this.playersId.length) {
+                    this.listOfTurns.push([volley]);
+                } else {
+                    lastTurn.push(volley);
+                }
+            }
+        } else {
+            this.listOfTurns.push([volley]);
+        }
+    }
+    pushShot(shotValue: String) {
+        const lastVolley = this.lastVolley;
+        console.log("🚀 ~ file: ShotHistory.ts ~ line 105 ~ ShotHistory ~ pushShot ~ lastVolley", lastVolley);
+        if (lastVolley) {
+            if (lastVolley.length < 3) {
+                const updatedVolley = lastVolley.concat([shotValue]);
+                console.log("🚀 ~ file: ShotHistory.ts ~ line 109 ~ ShotHistory ~ pushShot ~ updatedVolley", updatedVolley);
+                this.pop();
+                this.push(updatedVolley);
+            } else {
+                this.push([shotValue]);
+            }
+        } else {
+            this.push([shotValue]);
+        }
     }
     pop() {
-        const lastVolley = this.state[this.state.length - 1];
-        lastVolley.pop();
-        if (this.state[this.state.length - 1].length === 0 && this.state.length > 1) this.state.pop();
+        const lastTurn = this.getLastTurn();
+        lastTurn.pop();
+        if (this.getLastTurn().length === 0) {
+            this.listOfTurns.pop();
+        }
+    }
+    popShot() {
+        if (this.lastVolley) {
+            this.lastVolley.pop();
+            if (this.lastVolley.length === 0) {
+                this.pop();
+            }
+        }
     }
 }
 

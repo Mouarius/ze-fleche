@@ -26,22 +26,11 @@
         <img class="game-pad-shape" src="../../assets/gamepad-shape.svg" alt="shape" />
     </div>
 </template>
-<script>
-import {
-    calculateScore,
-    calculateShotValue,
-    calculateSumOfShots,
-    getActivePlayer,
-    getNextPlayer,
-    getPlayerLastShots,
-    getPreviousPlayer,
-    getPreviousPlayerIndex,
-    getPreviousPlayerInHistory,
-    setNextPlayerActive,
-    wait,
-} from "../../util/helper";
+<script lang="ts">
+import { getActivePlayer, getPlayerLastShots, getPreviousPlayerInHistory, setNextPlayerActive, wait } from "../../util/helper";
 import store from "../../store";
 import logger from "../../util/logger";
+import { calculatePlayerScore, calculateShotValue, calculateSumOfShots } from "../../util/helper/scoreHelper";
 
 export default {
     name: "GamePad",
@@ -57,9 +46,8 @@ export default {
     },
     computed: {
         activePlayer() {
-            return getActivePlayer(this.globalState.players)[0];
+            return store.getters.activePlayer();
         },
-
         playerShotsTotal() {
             return calculateSumOfShots(this.localState.typedShots);
         },
@@ -78,74 +66,60 @@ export default {
     },
     methods: {
         addShot(shotValue) {
-            //Adds the eventual score modifier to the registered shotValue
-            let parsedShotValue = this.scoreModifierSymbol + shotValue;
-            this.localState.scoreModifier = "";
-
-            let calculatedShotValue = calculateShotValue(parsedShotValue);
-
-            //Check if the added shots exceeds the score
-            const player = store.getters.findPlayer(this.activePlayer.id);
-            const currentScore = player.score;
-
-            if (currentScore - calculatedShotValue < 0) {
-                //Abort the three actual shots of the player
-                store.actions.abortCurrentPlayerShots(player.id);
-                this.localState.typedShots = [];
-            } else {
-                if (currentScore - calculatedShotValue === 0) {
-                    logger.info(player.name + " has won the game !");
-                    store.actions.win(player.id);
-                }
-                store.actions.addShotToPlayer(player.id, parsedShotValue);
-                this.localState.typedShots.push(parsedShotValue);
-            }
+            store.actions.addShotToPlayer(this.activePlayer.id, shotValue);
+            this.localState.typedShots.push(shotValue);
         },
-        removeLastShot() {
-            if (this.localState.typedShots.length > 0) {
-                logger.info(`Removing last shot from ${this.activePlayer.name}`);
+        handleUndoButton() {
+            if (this.localState.typedShots.length === 0) {
+                let previousPlayer = store.getters.lastPlayer();
+                if (previousPlayer) {
+                    store.actions.setActivePlayer(previousPlayer.id);
+                    this.localState.typedShots = [...previousPlayer.listOfShots.slice(-1)[0]];
+                }
+            } else {
                 this.localState.typedShots.pop();
-                store.actions.removeShotToPlayer(this.activePlayer.id);
+                return store.actions.removeLastShot();
             }
         },
         numberButtonClickHandler(e) {
             const buttonValue = e.target.textContent;
             logger.info(`${this.activePlayer.name} did a ${buttonValue}`);
+
             if (this.localState.typedShots.length < 3) {
-                this.addShot(buttonValue);
+                //Check here if he did too much ?
+                let parsedShotValue = this.scoreModifierSymbol + buttonValue;
+                this.localState.scoreModifier = "";
+                let calculatedShotValue = calculateShotValue(parsedShotValue);
+
+                let currentPlayerScore = calculatePlayerScore(this.globalState.shotHistory, "301", this.activePlayer.id);
+
+                if (calculatedShotValue > currentPlayerScore) {
+                    store.actions.abortCurrentPlayerShots(this.activePlayer.id);
+                } else {
+                    if (calculatedShotValue === currentPlayerScore) {
+                        logger.info(this.activePlayer.name + " has won the game !");
+                        store.actions.win(this.activePlayer.id);
+                    }
+                    this.addShot(parsedShotValue);
+                }
+
                 if (this.localState.typedShots.length === 3) {
                     this.moveToNextPlayer();
                 }
             }
         },
         functionButtonClickHandler(e) {
-            console.log("func");
             if (e.target.id === "undo") {
-                if (this.localState.typedShots.length === 0) {
-                    return this.moveToPreviousPlayer();
-                } else {
-                    return this.removeLastShot();
-                }
+                return this.handleUndoButton();
             }
             return (this.localState.scoreModifier = e.target.id);
         },
         moveToNextPlayer() {
             logger.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
-            wait(100).then(() => {
+            wait(500).then(() => {
                 this.localState.typedShots = [];
                 setNextPlayerActive(this.globalState.players);
             });
-        },
-        moveToPreviousPlayer() {
-            logger.info(`Mistakes have been made, moving to previous player...`);
-            let previousPlayer = getPreviousPlayerInHistory(this.globalState.players, this.globalState.shotsHistory);
-            console.log("🚀 ~ file: GamePad.vue ~ line 113 ~ moveToPreviousPlayer ~ previousPlayer", previousPlayer);
-            if (previousPlayer) {
-                logger.info("Previous player is ", previousPlayer.name);
-                store.actions.setActivePlayer(previousPlayer.id);
-                console.log(this.activePlayer);
-                this.localState.typedShots = [...getPlayerLastShots(this.activePlayer)];
-            }
         },
     },
     mounted() {

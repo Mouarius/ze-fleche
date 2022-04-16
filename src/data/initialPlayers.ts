@@ -1,15 +1,18 @@
 import { ref, computed } from "vue";
 import { calculateScore } from "../util/helper";
+import { Player } from "../util/types";
 
+const emma = new Player();
+const marius = new Player();
+
+emma.id = 0;
+emma.name = "Emma";
+
+marius.id = 1;
+marius.name = "Marius";
 const initialPlayers = [
-    // {
-    //     id: 0,
-    //     name: "Emma",
-    //     score: 0,
-    //     isActive: true,
-    //     listOfShots: [],
-    //     rank: 1,
-    // },
+    emma,
+    marius,
     // {
     //     id: 1,
     //     name: "Marius",
@@ -28,4 +31,4 @@ const initialPlayers = [
     // },
 ];
 
-export default initialPlayers;
+export default initialPlayers as Player[];

@@ -1,9 +1,11 @@
+import { Volley } from "../data/ShotHistory";
+
 export class Player {
     id = 0;
     name = "";
     score = 0;
     isActive = false;
-    listOfShots = [];
+    listOfShots = [] as Volley;
     rank = 1;
     winner = false;
 }

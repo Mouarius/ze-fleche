@@ -1,14 +1,6 @@
 <template>
     <ul class="leaderboard">
-        <leaderboard-item
-            v-for="player in globalState.players"
-            :key="player.id"
-            :playerName="player.name"
-            :score="player.score"
-            :isActive="player.isActive"
-            :rank="player.rank"
-            :listOfShots="player.listOfShots"
-        />
+        <leaderboard-item v-for="player in globalState.players" :key="player.id" :player="player" />
         <div class="active-rectangle" :style="{ transform: `translateY(${translateAmountPx})` }"></div>
     </ul>
 </template>
@@ -47,7 +39,7 @@ export default {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     .active-rectangle {
         content: "";
         display: block;

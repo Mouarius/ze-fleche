@@ -1,5 +1,4 @@
 import store from "../store";
-import logger from "./logger";
 import { Player, Shot, ShotRecord } from "./types";
 
 export const wait = (duration: number): Promise<void> =>
@@ -66,7 +65,6 @@ export const calculateScore = (gameMode: String, listOfShots: Shot[]): number =>
  * @returns Player
  */
 export const calculatePlayersScore = (gameMode: String, players: Player[]): Player[] => {
-    console.log("DEBUG - Recalculating players score");
     for (let i = 0; i < players.length; i++) {
         const player = players[i];
         player.score = calculateScore(gameMode, player.listOfShots);
@@ -130,18 +128,6 @@ export const getPreviousPlayerIndex = (players: Player[]): number => {
         return activePlayerIndex - 1;
     }
     return players.length - 1;
-};
-/**
- * Sets the player after the next player to the new active player
- * @param  {Player[]} players
- * @returns void
- */
-export const setNextPlayerActive = (players: Player[]): void => {
-    // logger.info(`All shots have been fired for ${this.activePlayer.name}, moving to next player...`);
-    const nextPlayer = getNextPlayer(players);
-    if (nextPlayer) {
-        store.actions.setActivePlayer(nextPlayer.id);
-    }
 };
 /**
  * Returns the Player object of the player after the active player
